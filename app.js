@@ -10,6 +10,20 @@ const CAP_LABELS = {
   4:"Diseño de pruebas", 5:"Gestión", 6:"Herramientas"
 };
 
+function buildResumenesGrid(){
+  const wrap = document.getElementById('resumenesGrid');
+  if(!wrap) return;
+  wrap.innerHTML = '';
+  Object.keys(FICHAS).forEach(cap=>{
+    const link = document.createElement('a');
+    link.className = 'chapter-chip download';
+    link.href = 'ISTQB_Resumen_Cap' + cap + '.pdf';
+    link.setAttribute('download', '');
+    link.innerHTML = `<div class="num">📄 ${cap}</div><div class="lbl">${CAP_LABELS[cap]}</div>`;
+    wrap.appendChild(link);
+  });
+}
+
 function buildChapterLinks(){
   const wrap = document.getElementById('chapterLinks');
   wrap.innerHTML = '';
@@ -151,6 +165,7 @@ function restartFlashDeck(){
 
 // ===== INIT =====
 document.addEventListener('DOMContentLoaded', () => {
+  buildResumenesGrid();
   buildChapterLinks();
   buildFlashChapterChips();
   renderFlashCard();
