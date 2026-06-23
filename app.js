@@ -24,21 +24,6 @@ function buildResumenesGrid(){
   });
 }
 
-function buildChapterLinks(){
-  const wrap = document.getElementById('chapterLinks');
-  wrap.innerHTML = '';
-  Object.keys(FICHAS).forEach(cap=>{
-    const chip = document.createElement('div');
-    chip.className = 'chapter-chip';
-    chip.innerHTML = `<div class="num">${cap}</div><div class="lbl">${CAP_LABELS[cap]}</div>`;
-    chip.onclick = () => {
-      scrollToId('fichas');
-      setTimeout(()=>selectFlashChapter(cap), 350);
-    };
-    wrap.appendChild(chip);
-  });
-}
-
 // ===== FICHAS DE ESTUDIO (flashcards) =====
 let flashState = {
   chapter: null,
@@ -166,7 +151,6 @@ function restartFlashDeck(){
 // ===== INIT =====
 document.addEventListener('DOMContentLoaded', () => {
   buildResumenesGrid();
-  buildChapterLinks();
   buildFlashChapterChips();
   renderFlashCard();
 });
