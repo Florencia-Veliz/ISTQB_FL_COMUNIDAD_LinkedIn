@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ISTQB FL — Simulador Modelo C</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --red:#0A66C2;--red-dark:#004182;--red-light:#E8F1FB;
+  --dark:#1A1A1A;--gray:#4A4A4A;--gray-mid:#7A7A7A;--gray-light:#F4F4F4;--border:#E0E0E0;
+  --white:#FFFFFF;--green:#2E7D32;--green-light:#E8F5E9;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Montserrat',system-ui,sans-serif;background:var(--gray-light);color:var(--dark);font-size:14px;min-height:100vh;}
+
+/* NAV */
+.nav{background:var(--dark);padding:0 2rem;display:flex;align-items:center;position:sticky;top:0;z-index:100;height:60px;gap:0;}
+.nav-logo{display:flex;align-items:center;gap:10px;padding-right:1.5rem;border-right:1px solid #333;margin-right:1.5rem;}
+.nav-logo-text{font-size:13px;font-weight:700;color:var(--white);letter-spacing:.08em;text-transform:uppercase;}
+.nav-logo-sub{font-size:10px;color:var(--red);letter-spacing:.1em;text-transform:uppercase;margin-top:1px;}
+.nav-right{margin-left:auto;display:flex;align-items:center;gap:10px;}
+.nav-meta{font-size:11px;color:#999;letter-spacing:.04em;}
+.nav-btn{font-size:11px;padding:.4rem 1rem;border:1px solid #444;border-radius:3px;color:#ccc;background:none;cursor:pointer;font-family:inherit;text-transform:uppercase;letter-spacing:.06em;font-weight:600;transition:all .15s;}
+.nav-btn:hover{border-color:var(--red);color:var(--white);}
+
+/* HERO */
+.hero{background:var(--dark);padding:2rem 2rem 1.75rem;border-bottom:3px solid var(--red);}
+.hero-tag{font-size:10px;font-weight:700;color:var(--red);letter-spacing:.15em;text-transform:uppercase;margin-bottom:.4rem;}
+.hero-title{font-size:20px;font-weight:700;color:var(--white);letter-spacing:.01em;margin-bottom:.3rem;}
+.hero-title span{color:var(--red);}
+.hero-sub{font-size:12px;color:#999;}
+
+/* SCREENS */
+.screen{display:none;}
+.screen.active{display:block;}
+
+/* START SCREEN */
+.start-wrap{max-width:640px;margin:2.5rem auto;padding:0 1.5rem;}
+.start-card{background:var(--white);border:1px solid var(--border);border-radius:4px;padding:2rem;}
+.start-card-title{font-size:16px;font-weight:700;color:var(--dark);margin-bottom:.3rem;}
+.start-card-sub{font-size:12px;color:var(--gray-mid);margin-bottom:1.75rem;line-height:1.6;}
+.stats-row{display:flex;gap:0;margin-bottom:1.75rem;border:1px solid var(--border);border-radius:3px;overflow:hidden;}
+.stat{flex:1;text-align:center;padding:.9rem .5rem;border-right:1px solid var(--border);}
+.stat:last-child{border-right:none;}
+.stat .n{font-size:1.4rem;font-weight:700;color:var(--red);line-height:1;}
+.stat .l{font-size:9px;font-weight:600;color:var(--gray-mid);text-transform:uppercase;letter-spacing:.06em;margin-top:3px;}
+
+.section-label{font-size:10px;font-weight:700;color:var(--red);letter-spacing:.15em;text-transform:uppercase;margin-bottom:.5rem;}
+.set-options{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:1.25rem;}
+.set-btn{background:var(--white);border:1px solid var(--border);color:var(--gray-mid);padding:.45rem 1rem;border-radius:3px;cursor:pointer;font-size:11px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;font-family:inherit;transition:all .15s;}
+.set-btn:hover{border-color:var(--dark);color:var(--dark);}
+.set-btn.selected{background:var(--dark);border-color:var(--dark);color:var(--white);}
+
+.mode-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:1.75rem;}
+.mode-card{background:var(--gray-light);border:1px solid var(--border);border-radius:3px;padding:1rem;cursor:pointer;transition:all .15s;}
+.mode-card:hover,.mode-card.selected{border-color:var(--red);background:var(--red-light);}
+.mode-card .icon{font-size:1.4rem;margin-bottom:.4rem;}
+.mode-card h3{font-size:12px;font-weight:700;color:var(--dark);margin-bottom:2px;text-transform:uppercase;letter-spacing:.04em;}
+.mode-card p{font-size:11px;color:var(--gray-mid);line-height:1.5;}
+.mode-card.selected h3{color:var(--red);}
+
+.start-btn{background:var(--red);color:var(--white);border:none;padding:.75rem 2rem;border-radius:3px;font-size:13px;font-weight:700;cursor:pointer;width:100%;font-family:inherit;text-transform:uppercase;letter-spacing:.08em;transition:background .15s;}
+.start-btn:hover{background:var(--red-dark);}
+
+/* EXAM SCREEN */
+.exam-wrap{max-width:820px;margin:0 auto;padding:1.5rem 1.5rem 5rem;}
+.progress-bar-wrap{background:var(--border);height:3px;margin-bottom:1.25rem;}
+.progress-bar-fill{background:var(--red);height:3px;transition:width .4s;}
+.exam-meta{display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;flex-wrap:wrap;gap:8px;}
+.exam-meta-left{font-size:11px;color:var(--gray-mid);font-weight:600;text-transform:uppercase;letter-spacing:.06em;}
+.timer{font-size:13px;font-weight:700;color:var(--dark);font-variant-numeric:tabular-nums;}
+.timer.warning{color:#C05C00;}
+.timer.danger{color:var(--red);}
+.flag-btn{background:none;border:1px solid var(--border);color:var(--gray-mid);padding:.35rem .8rem;border-radius:3px;cursor:pointer;font-size:11px;font-weight:600;font-family:inherit;text-transform:uppercase;letter-spacing:.04em;transition:all .15s;}
+.flag-btn.flagged{border-color:var(--red);color:var(--red);background:var(--red-light);}
+
+/* DOT NAV */
+.dot-nav{background:var(--white);border:1px solid var(--border);border-radius:3px;padding:10px 12px;margin-bottom:1rem;display:flex;flex-wrap:wrap;gap:4px;}
+.dot{width:26px;height:26px;border-radius:3px;border:1px solid var(--border);background:var(--gray-light);cursor:pointer;font-size:10px;font-weight:700;color:var(--gray-mid);display:flex;align-items:center;justify-content:center;transition:all .12s;position:relative;}
+.dot:hover{border-color:var(--dark);}
+.dot.answered{background:var(--red-light);border-color:var(--red);color:var(--red);}
+.dot.current{background:var(--dark);border-color:var(--dark);color:var(--white);}
+.dot.flagged::after{content:'';position:absolute;top:2px;right:2px;width:4px;height:4px;background:var(--red);border-radius:50%;}
+
+/* QUESTION CARD */
+.q-card{background:var(--white);border:1px solid var(--border);border-radius:4px;border-left:3px solid var(--red);padding:1.5rem 1.75rem;margin-bottom:1rem;}
+.q-badge{display:inline-flex;align-items:center;gap:6px;font-size:9px;font-weight:700;color:var(--gray-mid);background:var(--gray-light);border:1px solid var(--border);padding:2px 9px;border-radius:99px;text-transform:uppercase;letter-spacing:.06em;margin-bottom:.85rem;}
+.multi-hint{font-size:11px;color:var(--red);font-weight:600;margin-bottom:.75rem;display:flex;align-items:center;gap:5px;text-transform:uppercase;letter-spacing:.04em;}
+.q-text{font-size:13px;line-height:1.75;font-weight:500;margin-bottom:1.1rem;white-space:pre-wrap;color:var(--dark);}
+.options{display:flex;flex-direction:column;gap:7px;}
+.option{background:var(--gray-light);border:1px solid var(--border);border-radius:3px;padding:.75rem 1rem;cursor:pointer;display:flex;align-items:flex-start;gap:10px;transition:all .15s;font-size:12px;line-height:1.55;}
+.option:hover:not(.disabled){border-color:var(--dark);background:var(--white);}
+.option.selected-option{border-color:var(--dark);background:var(--white);}
+.option.correct{border-color:var(--green);background:var(--green-light);}
+.option.wrong{border-color:var(--red);background:var(--red-light);}
+.option.disabled{cursor:default;}
+.opt-letter{min-width:22px;height:22px;background:var(--border);border-radius:2px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;margin-top:1px;color:var(--gray);}
+.option.selected-option .opt-letter{background:var(--dark);color:var(--white);}
+.option.correct .opt-letter{background:var(--green);color:var(--white);}
+.option.wrong .opt-letter{background:var(--red);color:var(--white);}
+
+/* EXPLANATION */
+.explanation{background:var(--gray-light);border:1px solid var(--border);border-left:3px solid var(--green);border-radius:0 3px 3px 0;padding:.85rem 1rem;margin-top:.85rem;font-size:11px;line-height:1.7;display:none;color:var(--gray);}
+.explanation.visible{display:block;}
+.explanation strong{color:var(--dark);display:block;margin-bottom:3px;font-size:12px;}
+.explanation .obj{margin-top:6px;font-size:10px;color:var(--gray-mid);text-transform:uppercase;letter-spacing:.04em;}
+
+/* NAV ROW */
+.nav-row{display:flex;gap:8px;justify-content:space-between;margin-top:.85rem;}
+.nav-btn2{background:var(--white);border:1px solid var(--border);color:var(--gray);padding:.6rem 1.25rem;border-radius:3px;cursor:pointer;font-size:11px;font-weight:700;font-family:inherit;text-transform:uppercase;letter-spacing:.06em;transition:all .15s;}
+.nav-btn2:hover{border-color:var(--dark);color:var(--dark);}
+.nav-btn2.primary{background:var(--red);border-color:var(--red);color:var(--white);}
+.nav-btn2.primary:hover{background:var(--red-dark);}
+.nav-btn2.finish{background:var(--green);border-color:var(--green);color:var(--white);}
+.nav-btn2.finish:hover{background:#256029;}
+.nav-btn2:disabled{opacity:.35;cursor:default;}
+
+/* RESULTS */
+.results-wrap{max-width:760px;margin:2rem auto;padding:0 1.5rem 5rem;}
+.result-hero{background:var(--white);border:1px solid var(--border);border-left:3px solid var(--red);border-radius:4px;padding:2rem;text-align:center;margin-bottom:1rem;}
+.score-circle{width:120px;height:120px;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;margin:0 auto 1rem;border:3px solid var(--border);}
+.score-circle.pass{border-color:var(--green);}
+.score-circle.fail{border-color:var(--red);}
+.score-circle .pct{font-size:2rem;font-weight:800;line-height:1;}
+.score-circle.pass .pct{color:var(--green);}
+.score-circle.fail .pct{color:var(--red);}
+.score-circle .label{font-size:10px;color:var(--gray-mid);text-transform:uppercase;letter-spacing:.04em;margin-top:2px;}
+.verdict{font-size:1.3rem;font-weight:700;margin-bottom:6px;}
+.verdict.pass{color:var(--green);}
+.verdict.fail{color:var(--red);}
+.result-note{color:var(--gray-mid);font-size:11px;margin-bottom:1.25rem;}
+.result-stats{display:flex;justify-content:center;gap:0;margin-bottom:1.25rem;border:1px solid var(--border);border-radius:3px;overflow:hidden;max-width:360px;margin-left:auto;margin-right:auto;}
+.rs{flex:1;text-align:center;padding:.75rem .5rem;border-right:1px solid var(--border);}
+.rs:last-child{border-right:none;}
+.rs .n{font-size:1.3rem;font-weight:700;}
+.rs .l{font-size:9px;font-weight:600;color:var(--gray-mid);text-transform:uppercase;letter-spacing:.05em;margin-top:2px;}
+.rs.correct .n{color:var(--green);}
+.rs.wrong .n{color:var(--red);}
+.rs.skipped .n{color:var(--gray-mid);}
+.result-actions{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;}
+.result-actions button{background:var(--white);border:1px solid var(--border);color:var(--gray);padding:.55rem 1.25rem;border-radius:3px;cursor:pointer;font-size:11px;font-weight:700;font-family:inherit;text-transform:uppercase;letter-spacing:.06em;transition:all .15s;}
+.result-actions button:hover{border-color:var(--dark);color:var(--dark);}
+.result-actions .primary-btn{background:var(--red);border-color:var(--red);color:var(--white);}
+.result-actions .primary-btn:hover{background:var(--red-dark);}
+
+/* BREAKDOWN */
+.breakdown{background:var(--white);border:1px solid var(--border);border-radius:4px;padding:1.25rem 1.5rem;margin-bottom:.75rem;}
+.breakdown h3{font-size:10px;font-weight:700;color:var(--red);letter-spacing:.15em;text-transform:uppercase;margin-bottom:1rem;}
+.ch-row{display:flex;align-items:center;gap:10px;margin-bottom:9px;}
+.ch-label{min-width:80px;font-size:11px;color:var(--gray-mid);font-weight:600;text-transform:uppercase;letter-spacing:.03em;}
+.ch-bar-wrap{flex:1;background:var(--gray-light);border-radius:99px;height:6px;}
+.ch-bar{height:6px;border-radius:99px;transition:width .8s;}
+.ch-score{min-width:44px;text-align:right;font-size:11px;font-weight:700;color:var(--dark);}
+
+/* REVIEW LIST */
+.review-list{background:var(--white);border:1px solid var(--border);border-radius:4px;overflow:hidden;}
+.review-list h3{font-size:10px;font-weight:700;color:var(--red);letter-spacing:.15em;text-transform:uppercase;padding:1rem 1.25rem;border-bottom:1px solid var(--border);}
+.review-item{padding:.85rem 1.25rem;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;gap:10px;}
+.review-item:last-child{border-bottom:none;}
+.ri-status{width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;flex-shrink:0;margin-top:1px;font-weight:700;}
+.ri-status.ok{background:var(--green-light);color:var(--green);}
+.ri-status.no{background:var(--red-light);color:var(--red);}
+.ri-status.sk{background:var(--gray-light);color:var(--gray-mid);}
+.ri-body{flex:1;}
+.ri-qtext{font-size:11px;color:var(--gray);margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:520px;}
+.ri-answer{font-size:11px;}
+.ri-answer .got{color:var(--red);font-weight:600;}
+.ri-answer .expected{color:var(--green);font-weight:600;}
+
+@media(max-width:600px){
+  .mode-grid{grid-template-columns:1fr;}
+  .exam-wrap,.results-wrap,.start-wrap{padding:1rem 1rem 4rem;}
+  .stats-row{flex-wrap:wrap;}
+  .nav-logo-sub{display:none;}
+}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-logo">
+    <div class="nav-logo-text">ISTQB FL</div>
+  </div>
+  <div class="nav-right">
+    <span class="nav-meta" id="headerSub"></span>
+    <button class="nav-btn" onclick="goToStart()">← Volver</button>
+  </div>
+</nav>
+
+<div class="hero">
+  <div class="hero-tag">Certificación · ISTQB Foundation Level v4.0</div>
+  <div class="hero-title">Simulador <span>Modelo C</span></div>
+  <div class="hero-sub">40 preguntas oficiales ISTQB CTFL v4.0 · Traducido al español</div>
+</div>
+
+<!-- START -->
+<div id="startScreen" class="screen active">
+  <div class="start-wrap">
+    <div class="start-card">
+      <div class="start-card-title">Simulador Examen — Modelo C</div>
+      <div class="start-card-sub">40 preguntas oficiales ISTQB CTFL v4.0 · Traducido al español</div>
+      <div class="stats-row"><div class="stat"><div class="n">40</div><div class="l">Preguntas</div></div>
+        <div class="stat"><div class="n">65%</div><div class="l">Aprobación</div></div>
+        <div class="stat"><div class="n">65&#8217;</div><div class="l">Tiempo</div></div>
+        <div class="stat"><div class="n">6</div><div class="l">Capítulos</div></div></div>
+
+      <div class="section-label">Set de preguntas</div>
+      <div class="set-options"><button class="set-btn selected" data-set="main" onclick="selectSet(this,'main')">40 Preguntas (oficial)</button></div>
+
+      <div class="section-label">Modo</div>
+      <div class="mode-grid">
+        <div class="mode-card selected" data-mode="exam" onclick="selectMode(this,'exam')">
+          <div class="icon">⏱️</div>
+          <h3>Examen</h3>
+          <p>Cronómetro 65 min. Respuestas al finalizar.</p>
+        </div>
+        <div class="mode-card" data-mode="practice" onclick="selectMode(this,'practice')">
+          <div class="icon">📖</div>
+          <h3>Práctica</h3>
+          <p>Sin tiempo. Feedback inmediato con explicación.</p>
+        </div>
+      </div>
+      <button class="start-btn" onclick="startExam()">Comenzar →</button>
+    </div>
+  </div>
+</div>
+
+<!-- EXAM -->
+<div id="examScreen" class="screen">
+  <div class="exam-wrap">
+    <div class="progress-bar-wrap"><div class="progress-bar-fill" id="progressFill" style="width:0%"></div></div>
+    <div class="exam-meta">
+      <span class="exam-meta-left" id="qCounter">Pregunta 1 de 40</span>
+      <span class="timer" id="timerDisplay">65:00</span>
+      <button class="flag-btn" id="flagBtn" onclick="toggleFlag()">🚩 Marcar</button>
+    </div>
+    <div class="dot-nav" id="dotNav"></div>
+    <div class="q-card" id="questionCard"></div>
+    <div class="nav-row">
+      <button class="nav-btn2" id="prevBtn" onclick="navigate(-1)">← Anterior</button>
+      <button class="nav-btn2 primary" id="nextBtn" onclick="navigate(1)">Siguiente →</button>
+      <button class="nav-btn2 finish" id="finishBtn" style="display:none" onclick="finishExam()">Finalizar</button>
+    </div>
+  </div>
+</div>
+
+<!-- RESULTS -->
+<div id="resultsScreen" class="screen">
+  <div class="results-wrap">
+    <div class="result-hero" id="resultHero"></div>
+    <div class="breakdown" id="chBreakdown"></div>
+    <div class="review-list" id="reviewList"></div>
+  </div>
+</div>
+
+<script>
+const QUESTIONS = [
+  {
+    id: 1, cap: 1,
+    text: "¿Cuál de los siguientes describe MEJOR en qué consiste la 'ausencia del error' como principio de prueba?\na) El software no tiene defectos cuando pasa todas las pruebas planificadas.\nb) Encontrar y corregir defectos no sirve de nada si el sistema no cumple las necesidades y expectativas de los usuarios.\nc) Un sistema sin defectos es siempre un sistema de alta calidad.\nd) Las pruebas solo son necesarias cuando el software contiene defectos conocidos.",
+    opts: ["a", "b", "c", "d"],
+    labels: ["a) El software no tiene defectos cuando pasa todas las pruebas planificadas.", "b) Encontrar y corregir defectos no sirve de nada si el sistema no cumple las necesidades y expectativas de los usuarios.", "c) Un sistema sin defectos es siempre un sistema de alta calidad.", "d) Las pruebas solo son necesarias cuando el software contiene defectos conocidos."],
+    correct: ["b"],
+    obj: "FL-1.x", k: "K2",
+    explanation: "La 'falacia de la ausencia del error' establece que encontrar y corregir defectos no ayuda si el sistema no cumple las necesidades reales de los usuarios. Un sistema puede pasar todas las pruebas y estar libre de defectos, pero aun así ser de baja calidad si no satisface las necesidades del usuario."
+  },
+  {
+    id: 2, cap: 1,
+    text: "¿Cuál de los siguientes describe MEJOR la diferencia entre un error, un defecto y un fallo?\na) Un error es una imperfección en el software; un defecto es cometido por una persona; un fallo es el resultado de ejecutar un defecto.\nb) Un defecto es una imperfección en el software causada por un error humano; un fallo es el resultado observable cuando se ejecuta el defecto.\nc) Un fallo se da cuando el software no funciona; un defecto es la causa del fallo; un error es la corrección del defecto.\nd) Un error y un defecto son lo mismo; un fallo ocurre cuando el defecto se detecta durante las pruebas.",
+    opts: ["a", "b", "c", "d"],
+    labels: ["a) Un error es una imperfección en el software; un defecto es cometido por una persona; un fallo es el resultado de ejecutar un defecto.", "b) Un defecto es una imperfección en el software causada por un error humano; un fallo es el resultado observable cuando se ejecuta el defecto.", "c) Un fallo se da cuando el software no funciona; un defecto es la causa del fallo; un error es la corrección del defecto.", "d) Un error y un defecto son lo mismo; un fallo ocurre cuando el defecto se detecta durante las pruebas."],
+    correct: ["b"],
+    obj: "FL-1.x", k: "K2",
+    explanation: "Un error es una acción humana (equivocación). El error produce un defecto (imperfección en el artefacto, p. ej. en el código). Cuando el código con el defecto se ejecuta, puede producir un fallo (comportamiento incorrecto observable en el sistema)."
+  },
+  {
+    id: 3, cap: 1,
+    text: "¿Cuál de los siguientes describe MEJOR por qué las pruebas dependen del contexto?\na) Diferentes tipos de software requieren los mismos tipos de pruebas, pero en diferente orden.\nb) El mismo enfoque de prueba puede aplicarse a cualquier tipo de sistema de software.\nc) Las pruebas para software de seguridad crítica se realizan de forma diferente a las pruebas para aplicaciones de comercio electrónico.\nd) El contexto de un proyecto de pruebas se refiere únicamente al tamaño del equipo y al presupuesto disponible.",
+    opts: ["a", "b", "c", "d"],
+    labels: ["a) Diferentes tipos de software requieren los mismos tipos de pruebas, pero en diferente orden.", "b) El mismo enfoque de prueba puede aplicarse a cualquier tipo de sistema de software.", "c) Las pruebas para software de seguridad crítica se realizan de forma diferente a las pruebas para aplicaciones de comercio electrónico.", "d) El contexto de un proyecto de pruebas se refiere únicamente al tamaño del equipo y al presupuesto disponible."],
+    correct: ["c"],
+    obj: "FL-1.x", k: "K2",
+    explanation: "Las pruebas dependen del contexto porque distintos sistemas tienen diferentes características, requisitos y riesgos. Una aplicación de control de vuelo requiere pruebas mucho más rigurosas y formales que una aplicación de comercio electrónico. El contexto (dominio, riesgos, ciclo de vida, etc.) determina el enfoque de prueba adecuado."
+  },
+  {
+    id: 4, cap: 1,
+    text: "¿Cuál de las siguientes actividades es la más representativa de las pruebas dinámicas?\na) Realizar un análisis de código estático con una herramienta.\nb) Revisar la especificación de diseño para detectar inconsistencias.\nc) Ejecutar una aplicación con datos de prueba y observar su comportamiento.\nd) Inspeccionar el código fuente para verificar el cumplimiento de los estándares de codificación.",
+    opts: ["a", "b", "c", "d"],
+    labels: ["a) Realizar un análisis de código estático con una herramienta.", "b) Revisar la especificación de diseño para detectar inconsistencias.", "c) Ejecutar una aplicación con datos de prueba y observar su comportamiento.", "d) Inspeccionar el código fuente para verificar el cumplimiento de los estándares de codificación."],
+    correct: ["c"],
+    obj: "FL-1.x", k: "K2",
+    explanation: "Las pruebas dinámicas implican la ejecución del software. Ejecutar una aplicación con datos de prueba y observar el comportamiento resultante es un ejemplo claro de prueba dinámica. Las otras opciones son ejemplos de pruebas estáticas (no requieren la ejecución del software)."
+  },
+  {
+    id: 5, cap: 1,
+    text: "¿Cuál de los siguientes describe MEJOR cómo contribuye el testing a la calidad del software?\na) El testing garantiza que no habrá defectos en el software entregado al usuario.\nb) El testing ayuda a medir la calidad del software e identificar defectos, permitiendo su corrección y reduciendo el riesgo de fallos en producción.\nc) El testing reemplaza la necesidad de revisiones de código y otras técnicas de garantía de calidad.\nd) El testing es la única actividad en el SDLC que contribuye directamente a la calidad del software.",
+    opts: ["a", "b", "c", "d"],
+    labels: ["a) El testing garantiza que no habrá defectos en el software entregado al usuario.", "b) El testing ayuda a medir la calidad del software e identificar defectos, permitiendo su corrección y reduciendo el riesgo de fallos en producción.", "c) El testing reemplaza la necesidad de revisiones de código y otras técnicas de garantía de calidad.", "d) El testing es la única actividad en el SDLC que contribuye directamente a la calidad del software."],
+    correct: ["b"],
+    obj: "FL-1.x", k: "K2",
+    explanation: "El testing contribuye a la calidad midiendo la calidad del software (mediante métricas de defectos y cobertura), detectando defectos para que puedan corregirse, y reduciendo el riesgo de que fallos lleguen a producción. No garantiza la ausencia de defectos ni reemplaza otras actividades de QA."
+  },
+  {
+    id: 6, cap: 2,
+    text: "¿Cuál de los siguientes describe MEJOR la diferencia entre pruebas de integración de componentes y pruebas de integración de sistemas?\na) Las pruebas de integración de componentes verifican las interfaces entre componentes dentro de un sistema; las de integración de sistemas verifican las interfaces entre sistemas diferentes.\nb) Las pruebas de integración de sistemas se realizan antes que las de integración de componentes en el ciclo de vida del desarrollo.\nc) Las pruebas de integración de componentes son realizadas por los usuarios finales; las de integración de sistemas son realizadas por el equipo de desarrollo.\nd) Las pruebas de integración de componentes verifican los requisitos del sistema completo; las de integración de sistemas verifican los requisitos individuales de los componentes.",
+    opts: ["a", "b", "c", "d"],
+    labels: ["a) Las pruebas de integración de componentes verifican las interfaces entre componentes dentro de un sistema; las de integración de sistemas verifican las interfaces entre sistemas diferentes.", "b) Las pruebas de integración de sistemas se realizan antes que las de integración de componentes en el ciclo de vida del desarrollo.", "c) Las pruebas de integración de componentes son realizadas por los usuarios finales; las de integración de sistemas son realizadas por el equipo de desarrollo.", "d) Las pruebas de integración de componentes verifican los requisitos del sistema completo; las de integración de sistemas verifican los requisitos individuales de los componentes."],
+    correct: ["a"],
+    obj: "FL-2.x", k: "K2",
+    explanation: "Las pruebas de integración de componentes verifican la interacción entre componentes dentro de un mismo sistema (p. ej., entre módulos). Las pruebas de integración de sistemas verifican la interacción entre diferentes sistemas (p. ej., entre el sistema y servicios externos o bases de datos)."
+  },
+  {
+    id: 7, cap: 2,
+    text: "¿Cuál de los siguientes describe MEJOR el propósito de las pruebas operativas (también conocidas como pruebas de aceptación operacional)?\na) Verificar que el sistema cumple los requisitos funcionales del usuario.\nb) Verificar que el sistema cumple los criterios de aceptación no funcionales como mantenibilidad, fiabilidad y recuperabilidad.\nc) Verificar que los componentes individuales del sistema funcionan correctamente.\nd) Verificar que el sistema se integra correctamente con sistemas de terceros.",
+    opts: ["a", "b", "c", "d"],
+    labels: ["a) Verificar que el sistema cumple los requisitos funcionales del usuario.", "b) Verificar que el sistema cumple los criterios de aceptación no funcionales como mantenibilidad, fiabilidad y recuperabilidad.", "c) Verificar que los componentes individuales del sistema funcionan correctamente.", "d) Verificar que el sistema se integra correctamente con sistemas de terceros."],
+    correct: ["b"],
+    obj: "FL-2.x", k: "K2",
+    explanation: "Las pruebas de aceptación operacional (OAT) se centran en aspectos no funcionales del sistema desde la perspectiva operativa: backup/restauración, instalación/desinstalación, gestión de usuarios, rendimiento bajo carga operacional, seguridad, etc."
+  },
+  {
+    id: 8, cap: 2,
+    text: "¿Cuál de los siguientes describe MEJOR el propósito de las pruebas de aceptación de contrato y normativas?\na) Verificar que el sistema cumple los contratos especificados y las normativas gubernamentales, industriales o legales aplicables.\nb) Verificar que el sistema cumple los requisitos funcionales definidos por el cliente.\nc) Verificar que el equipo de desarrollo ha seguido los procesos de desarrollo acordados.\nd) Verificar que el sistema puede desplegarse en el entorno de producción previsto.",
+    opts: ["a", "b", "c", "d"],
+    labels: ["a) Verificar que el sistema cumple los contratos especificados y las normativas gubernamentales, industriales o legales aplicables.", "b) Verificar que el sistema cumple los requisitos funcionales definidos por el cliente.", "c) Verificar que el equipo de desarrollo ha seguido los procesos de desarrollo acordados.", "d) Verificar que el sistema puede desplegarse en el entorno de producción previsto."],
+    correct: ["a"],
+    obj: "FL-2.x", k: "K2",
+    explanation: "Las pruebas de aceptación contractual verifican que el sistema cumple los contratos definidos entre el proveedor y el cliente. Las pruebas de aceptación normativa verifican que el sistema cumple las regulaciones, estándares o requisitos legales aplicables al dominio (p. ej., normativas financieras, sanitarias o de seguridad)."
+  },
+  {
+    id: 9, cap: 2,
+    text: "¿Cuál de los siguientes describe MEJOR el concepto de 'testware'?\na) Las herramientas de software utilizadas para automatizar las pruebas.\nb) Los artefactos producidos durante el proceso de prueba, como planes de prueba, casos de prueba y datos de prueba.\nc) El software que está siendo sometido a prueba.\nd) Las métricas de calidad utilizadas para evaluar el proceso de prueba.",
+    opts: ["a", "b", "c", "d"],
+    labels: ["a) Las herramientas de software utilizadas para automatizar las pruebas.", "b) Los artefactos producidos durante el proceso de prueba, como planes de prueba, casos de prueba y datos de prueba.", "c) El software que está siendo sometido a prueba.", "d) Las métricas de calidad utilizadas para evaluar el proceso de prueba."],
+    correct: ["b"],
+    obj: "FL-2.x", k: "K2",
+    explanation: "El testware son todos los artefactos producidos durante el proceso de prueba: planes de prueba, casos de prueba, procedimientos de prueba, datos de prueba, informes de prueba, scripts de automatización, etc. No es el software bajo prueba ni las herramientas de prueba."
+  },
+  {
+    id: 10, cap: 2,
+    text: "¿Cuál de los siguientes describe MEJOR cómo se aplican las actividades del proceso de prueba fundamental en las metodologías de desarrollo ágil?\na) Las actividades del proceso de prueba fundamental no se aplican en el desarrollo ágil porque las metodologías ágiles no requieren planificación formal.\nb) Las actividades del proceso de prueba fundamental se aplican de forma iterativa dentro de cada sprint, con el alcance y la duración adaptados al contexto ágil.\nc) En el desarrollo ágil, las actividades de planificación y diseño de pruebas se realizan al final del proyecto en lugar de antes de la ejecución.\nd) Las metodologías ágiles requieren que todas las actividades del proceso de prueba se realicen simultáneamente, sin seguir ningún orden.",
+    opts: ["a", "b", "c", "d"],
+    labels: ["a) Las actividades del proceso de prueba fundamental no se aplican en el desarrollo ágil porque las metodologías ágiles no requieren planificación formal.", "b) Las actividades del proceso de prueba fundamental se aplican de forma iterativa dentro de cada sprint, con el alcance y la duración adaptados al contexto ágil.", "c) En el desarrollo ágil, las actividades de planificación y diseño de pruebas se realizan al final del proyecto en lugar de antes de la ejecución.", "d) Las metodologías ágiles requieren que todas las actividades del proceso de prueba se realicen simultáneamente, sin seguir ningún orden."],
+    correct: ["b"],
+    obj: "FL-2.x", k: "K2",
+    explanation: "En el desarrollo ágil, las actividades del proceso de prueba (planificación, análisis, diseño, implementación, ejecución, compleción) se aplican dentro de cada iteración/sprint. La planificación es más ligera y continua, y las actividades se solapan más que en modelos secuenciales, pero siguen siendo necesarias."
+  },
+  {
+    id: 11, cap: 3,
+    text: "¿Cuál de los siguientes es un ejemplo de defecto que puede detectarse mediante pruebas estáticas pero que es difícil de encontrar con pruebas dinámicas?\na) Un cálculo incorrecto que produce resultados erróneos en tiempo de ejecución.\nb) Un requisito ambiguo que puede interpretarse de múltiples maneras.\nc) Un fallo de rendimiento que solo se manifiesta bajo alta carga.\nd) Un error de interfaz de usuario que solo es visible en determinadas resoluciones de pantalla.",
+    opts: ["a", "b", "c", "d"],
+    labels: ["a) Un cálculo incorrecto que produce resultados erróneos en tiempo de ejecución.", "b) Un requisito ambiguo que puede interpretarse de múltiples maneras.", "c) Un fallo de rendimiento que solo se manifiesta bajo alta carga.", "d) Un error de interfaz de usuario que solo es visible en determinadas resoluciones de pantalla."],
+    correct: ["b"],
+    obj: "FL-3.x", k: "K2",
+    explanation: "Los requisitos ambiguos son difíciles de detectar con pruebas dinámicas porque el software ya se ha construido según una interpretación concreta. Las revisiones estáticas de los requisitos permiten identificar ambigüedades, inconsistencias y omisiones antes de que el código se escriba."
+  },
+  {
+    id: 12, cap: 3,
+    text: "¿Cuál de los siguientes describe MEJOR el propósito de una 'walkthrough' (recorrido) como tipo de revisión?\na) Detectar defectos de forma sistemática usando una lista de verificación formal.\nb) Permitir al autor presentar el artefacto a los participantes para obtener comprensión, retroalimentación y consenso.\nc) Realizar una evaluación independiente del artefacto sin la presencia del autor.\nd) Proporcionar al equipo métricas formales sobre la densidad de defectos en el artefacto.",
+    opts: ["a", "b", "c", "d"],
+    labels: ["a) Detectar defectos de forma sistemática usando una lista de verificación formal.", "b) Permitir al autor presentar el artefacto a los participantes para obtener comprensión, retroalimentación y consenso.", "c) Realizar una evaluación independiente del artefacto sin la presencia del autor.", "d) Proporcionar al equipo métricas formales sobre la densidad de defectos en el artefacto."],
+    correct: ["b"],
+    obj: "FL-3.x", k: "K2",
+    explanation: "Una walkthrough es un tipo de revisión informal o semi-formal donde el autor guía a los participantes a través del artefacto. Sus objetivos incluyen compartir conocimiento, obtener retroalimentación, explorar alternativas y detectar posibles defectos, pero de forma colaborativa y no confrontacional."
+  },
+  {
+    id: 13, cap: 3,
+    text: "¿Cuál de los siguientes factores de éxito es más importante para garantizar que las revisiones sean efectivas?\na) Utilizar siempre el tipo más formal de revisión (inspección) para todos los artefactos.\nb) Tener revisores suficientemente formados que comprendan cómo participar y proporcionar retroalimentación constructiva.\nc) Asegurarse de que el autor no esté presente durante la reunión de revisión para fomentar la objetividad.\nd) Mantener reuniones de revisión de al menos cuatro horas para garantizar una cobertura completa del artefacto.",
+    opts: ["a", "b", "c", "d"],
+    labels: ["a) Utilizar siempre el tipo más formal de revisión (inspección) para todos los artefactos.", "b) Tener revisores suficientemente formados que comprendan cómo participar y proporcionar retroalimentación constructiva.", "c) Asegurarse de que el autor no esté presente durante la reunión de revisión para fomentar la objetividad.", "d) Mantener reuniones de revisión de al menos cuatro horas para garantizar una cobertura completa del artefacto."],
+    correct: ["b"],
+    obj: "FL-3.x", k: "K2",
+    explanation: "Para que las revisiones sean efectivas, los revisores deben estar formados en cómo llevarlas a cabo, incluyendo cómo proporcionar retroalimentación objetiva y constructiva. Otros factores clave incluyen tener el artefacto correcto en el momento correcto, y que los participantes tengan tiempo suficiente para prepararse."
+  },
+  {
+    id: 14, cap: 4,
+    text: "Se está probando un sistema de login. Un nombre de usuario válido tiene entre 6 y 12 caracteres. Usando análisis de valores límite de 3 valores, ¿qué conjunto cubre correctamente los límites del campo de nombre de usuario?\na) 5, 6, 7, 11, 12, 13\nb) 6, 12\nc) 1, 6, 12, 20\nd) 5, 9, 13",
+    opts: ["a", "b", "c", "d"],
+    labels: ["a) 5, 6, 7, 11, 12, 13", "b) 6, 12", "c) 1, 6, 12, 20", "d) 5, 9, 13"],
+    correct: ["a"],
+    obj: "FL-4.x", k: "K2",
+    explanation: "El BVA de 3 valores prueba: el valor en el límite, uno por debajo y uno por encima. Para el límite inferior (6): 5, 6, 7. Para el límite superior (12): 11, 12, 13. Por lo tanto, el conjunto completo es {5, 6, 7, 11, 12, 13}."
+  },
+  {
+    id: 15, cap: 4,
+    text: "¿Cuál de los siguientes describe MEJOR cuándo es más apropiado utilizar tablas de decisión?\na) Cuando se necesita probar el comportamiento del sistema en respuesta a secuencias de eventos.\nb) Cuando el comportamiento del sistema está determinado por combinaciones de condiciones de negocio.\nc) Cuando se necesita maximizar la cobertura de ramas del código fuente.\nd) Cuando se necesita probar el comportamiento del sistema con datos de entrada dentro y fuera de rangos válidos.",
+    opts: ["a", "b", "c", "d"],
+    labels: ["a) Cuando se necesita probar el comportamiento del sistema en respuesta a secuencias de eventos.", "b) Cuando el comportamiento del sistema está determinado por combinaciones de condiciones de negocio.", "c) Cuando se necesita maximizar la cobertura de ramas del código fuente.", "d) Cuando se necesita probar el comportamiento del sistema con datos de entrada dentro y fuera de rangos válidos."],
+    correct: ["b"],
+    obj: "FL-4.x", k: "K2",
+    explanation: "Las tablas de decisión son especialmente útiles cuando el comportamiento del sistema depende de combinaciones de múltiples condiciones de negocio. Cada columna de la tabla representa una combinación única de condiciones (regla de negocio), lo que ayuda a garantizar que todas las combinaciones importantes se han probado."
+  },
+  {
+    id: 16, cap: 4,
+    text: "Un sistema de cajero automático tiene los siguientes estados: 'Esperando tarjeta', 'Validando PIN', 'Seleccionando operación', 'Procesando transacción', 'Expulsando tarjeta'. ¿Cuál de los siguientes describe MEJOR qué se prueba con una tabla de transición de estados?\na) El número de transacciones que el cajero puede procesar por día.\nb) Si el sistema se comporta correctamente en cada estado posible y responde adecuadamente a los eventos, incluyendo transiciones válidas e inválidas.\nc) El rendimiento del cajero bajo condiciones de alta carga de transacciones.\nd) La usabilidad de la interfaz del cajero para diferentes tipos de usuarios.",
+    opts: ["a", "b", "c", "d"],
+    labels: ["a) El número de transacciones que el cajero puede procesar por día.", "b) Si el sistema se comporta correctamente en cada estado posible y responde adecuadamente a los eventos, incluyendo transiciones válidas e inválidas.", "c) El rendimiento del cajero bajo condiciones de alta carga de transacciones.", "d) La usabilidad de la interfaz del cajero para diferentes tipos de usuarios."],
+    correct: ["b"],
+    obj: "FL-4.x", k: "K2",
+    explanation: "Las pruebas de transición de estados verifican que el sistema responde correctamente a los eventos en cada estado (transiciones válidas), y que el sistema maneja adecuadamente los intentos de transición inválida (p. ej., intentar retirar dinero antes de validar el PIN)."
+  },
+  {
+    id: 17, cap: 4,
+    text: "¿Cuál de los siguientes describe MEJOR el propósito de las pruebas de cobertura de condiciones modificada/decisión (MC/DC)?\na) Garantizar que cada sentencia del código se ejecuta al menos una vez.\nb) Garantizar que cada condición individual de cada decisión ha tomado todos los valores posibles de forma independiente.\nc) Garantizar que todos los caminos posibles a través del código se ejecutan al menos una vez.\nd) Garantizar que cada posible valor de entrada se prueba al menos una vez.",
+    opts: ["a", "b", "c", "d"],
+    labels: ["a) Garantizar que cada sentencia del código se ejecuta al menos una vez.", "b) Garantizar que cada condición individual de cada decisión ha tomado todos los valores posibles de forma independiente.", "c) Garantizar que todos los caminos posibles a través del código se ejecutan al menos una vez.", "d) Garantizar que cada posible valor de entrada se prueba al menos una vez."],
+    correct: ["b"],
+    obj: "FL-4.x", k: "K2",
+    explanation: "MC/DC (Modified Condition/Decision Coverage) requiere que cada condición elemental en cada decisión haya tomado todos los valores posibles (V/F), y que cada condición haya influido independientemente en el resultado de la decisión. Se utiliza en software de seguridad crítica (p. ej., aviación)."
+  },
+  {
+    id: 18, cap: 4,
+    text: "¿Cuál de los siguientes describe MEJOR la diferencia entre las pruebas basadas en la experiencia y las técnicas de prueba de caja negra?\na) Las técnicas basadas en la experiencia se derivan sistemáticamente de las especificaciones; las de caja negra dependen del conocimiento y la intuición del tester.\nb) Las técnicas de caja negra se derivan sistemáticamente de la especificación funcional; las basadas en la experiencia dependen del conocimiento y la experiencia del tester.\nc) Las técnicas de caja negra solo pueden usarse en pruebas de sistema; las basadas en la experiencia se usan en pruebas unitarias.\nd) Las técnicas basadas en la experiencia son más eficaces que las de caja negra para detectar defectos de interfaz.",
+    opts: ["a", "b", "c", "d"],
+    labels: ["a) Las técnicas basadas en la experiencia se derivan sistemáticamente de las especificaciones; las de caja negra dependen del conocimiento y la intuición del tester.", "b) Las técnicas de caja negra se derivan sistemáticamente de la especificación funcional; las basadas en la experiencia dependen del conocimiento y la experiencia del tester.", "c) Las técnicas de caja negra solo pueden usarse en pruebas de sistema; las basadas en la experiencia se usan en pruebas unitarias.", "d) Las técnicas basadas en la experiencia son más eficaces que las de caja negra para detectar defectos de interfaz."],
+    correct: ["b"],
+    obj: "FL-4.x", k: "K2",
+    explanation: "Las técnicas de caja negra (análisis de partición de equivalencia, BVA, tablas de decisión, etc.) derivan casos de prueba de forma sistemática a partir de las especificaciones. Las técnicas basadas en la experiencia (suposición de errores, pruebas exploratorias, etc.) dependen principalmente del conocimiento, la experiencia y la intuición del tester."
+  },
+  {
+    id: 19, cap: 4,
+    text: "¿Cuál de los siguientes describe MEJOR la técnica de 'suposición de errores' (error guessing)?\na) Diseñar casos de prueba basándose en análisis formales de los requisitos del sistema.\nb) Predecir los tipos de errores, defectos y fallos más probables basándose en la experiencia, el conocimiento del sistema y los defectos históricos.\nc) Ejecutar pruebas sin ningún plan ni objetivo predefinido.\nd) Utilizar herramientas de análisis estático para predecir los defectos más probables en el código.",
+    opts: ["a", "b", "c", "d"],
+    labels: ["a) Diseñar casos de prueba basándose en análisis formales de los requisitos del sistema.", "b) Predecir los tipos de errores, defectos y fallos más probables basándose en la experiencia, el conocimiento del sistema y los defectos históricos.", "c) Ejecutar pruebas sin ningún plan ni objetivo predefinido.", "d) Utilizar herramientas de análisis estático para predecir los defectos más probables en el código."],
+    correct: ["b"],
+    obj: "FL-4.x", k: "K2",
+    explanation: "La suposición de errores es una técnica basada en la experiencia donde el tester predice los errores, defectos y fallos más probables en el sistema, basándose en su conocimiento del sistema, defectos pasados, defectos típicos para ese tipo de sistema, y su intuición profesional."
+  },
+  {
+    id: 20, cap: 4,
+    text: "Se está probando un validador de PIN. Un PIN es válido si consiste en cuatro dígitos y no todos son iguales. Se han identificado las siguientes particiones de equivalencia válidas: EP1 = PINs con exactamente 4 dígitos y al menos dos diferentes. ¿Cuál de los siguientes conjuntos de datos de prueba cubre todas las particiones de equivalencia?\na) 1111, 1234\nb) 123, 1234, 12345\nc) 1234\nd) 0000, 1111, 9999",
+    opts: ["a", "b", "c", "d"],
+    labels: ["a) 1111, 1234", "b) 123, 1234, 12345", "c) 1234", "d) 0000, 1111, 9999"],
+    correct: ["a"],
+    obj: "FL-4.x", k: "K2",
+    explanation: "Para cubrir todas las particiones, necesitamos representantes de: partición válida (4 dígitos, al menos 2 diferentes → p. ej., 1234) y partición inválida (4 dígitos todos iguales → p. ej., 1111). El par {1111, 1234} cubre ambas particiones. Las otras opciones no cubren ambas particiones o cubren particiones no mencionadas."
+  },
+  {
+    id: 21, cap: 5,
+    text: "¿Cuál de los siguientes describe MEJOR cómo se usan los riesgos en las pruebas basadas en riesgos?\na) Los riesgos se usan para justificar la cancelación de las pruebas cuando el presupuesto es insuficiente.\nb) Los riesgos se usan para determinar dónde enfocar el esfuerzo de prueba, priorizando las áreas de mayor riesgo.\nc) Los riesgos se documentan pero no afectan al diseño de los casos de prueba.\nd) Los riesgos solo se consideran al final del proyecto de pruebas.",
+    opts: ["a", "b", "c", "d"],
+    labels: ["a) Los riesgos se usan para justificar la cancelación de las pruebas cuando el presupuesto es insuficiente.", "b) Los riesgos se usan para determinar dónde enfocar el esfuerzo de prueba, priorizando las áreas de mayor riesgo.", "c) Los riesgos se documentan pero no afectan al diseño de los casos de prueba.", "d) Los riesgos solo se consideran al final del proyecto de pruebas."],
+    correct: ["b"],
+    obj: "FL-5.x", k: "K2",
+    explanation: "En las pruebas basadas en riesgos, el nivel de riesgo de cada área del sistema (determinado por la probabilidad de fallo y el impacto) se usa para priorizar el esfuerzo de prueba. Las áreas de mayor riesgo se prueban más exhaustivamente, y en primer lugar, para maximizar el valor de las pruebas."
+  },
+  {
+    id: 22, cap: 5,
+    text: "¿Cuál de los siguientes describe MEJOR el papel del tester en la estimación del esfuerzo de prueba?\na) El tester no participa en la estimación; esta es exclusivamente responsabilidad del gestor de pruebas.\nb) El tester proporciona estimaciones de esfuerzo basadas en su experiencia y en el análisis de los requisitos de prueba.\nc) El tester estima el esfuerzo de prueba después de que se hayan completado todas las pruebas.\nd) El tester solo estima el tiempo necesario para la ejecución de pruebas, no para otras actividades.",
+    opts: ["a", "b", "c", "d"],
+    labels: ["a) El tester no participa en la estimación; esta es exclusivamente responsabilidad del gestor de pruebas.", "b) El tester proporciona estimaciones de esfuerzo basadas en su experiencia y en el análisis de los requisitos de prueba.", "c) El tester estima el esfuerzo de prueba después de que se hayan completado todas las pruebas.", "d) El tester solo estima el tiempo necesario para la ejecución de pruebas, no para otras actividades."],
+    correct: ["b"],
+    obj: "FL-5.x", k: "K2",
+    explanation: "Los testers participan activamente en la estimación del esfuerzo, aportando su experiencia técnica sobre la complejidad de las pruebas, el análisis de los requisitos y la experiencia de proyectos pasados. La estimación abarca todas las actividades de prueba, no solo la ejecución."
+  },
+  {
+    id: 23, cap: 5,
+    text: "¿Cuál de los siguientes describe MEJOR las diferencias entre las pruebas de caja negra, caja blanca y basadas en la experiencia en términos de su base de diseño de pruebas?\na) Caja negra: especificación funcional; caja blanca: estructura interna del código; experiencia: conocimiento del tester.\nb) Caja negra: estructura interna del código; caja blanca: especificación funcional; experiencia: documentación del usuario.\nc) Caja negra: conocimiento del tester; caja blanca: especificación funcional; experiencia: estructura del código.\nd) Caja negra y caja blanca usan la misma base; las pruebas basadas en la experiencia no tienen base formal.",
+    opts: ["a", "b", "c", "d"],
+    labels: ["a) Caja negra: especificación funcional; caja blanca: estructura interna del código; experiencia: conocimiento del tester.", "b) Caja negra: estructura interna del código; caja blanca: especificación funcional; experiencia: documentación del usuario.", "c) Caja negra: conocimiento del tester; caja blanca: especificación funcional; experiencia: estructura del código.", "d) Caja negra y caja blanca usan la misma base; las pruebas basadas en la experiencia no tienen base formal."],
+    correct: ["a"],
+    obj: "FL-5.x", k: "K2",
+    explanation: "Las pruebas de caja negra se basan en las especificaciones funcionales. Las de caja blanca se basan en la estructura interna del software (código, arquitectura). Las basadas en la experiencia se basan en el conocimiento y la intuición del tester, incluyendo conocimiento del dominio, defectos típicos y experiencia previa."
+  },
+  {
+    id: 24, cap: 5,
+    text: "¿Cuál de los siguientes describe MEJOR qué es un 'nivel de riesgo'?\na) El costo total de mitigar un riesgo identificado.\nb) Una medida que combina la probabilidad de que ocurra un riesgo y el impacto que tendría si ocurriera.\nc) El número de defectos esperados en una parte específica del sistema.\nd) La gravedad de un defecto según la clasificación del sistema de gestión de defectos.",
+    opts: ["a", "b", "c", "d"],
+    labels: ["a) El costo total de mitigar un riesgo identificado.", "b) Una medida que combina la probabilidad de que ocurra un riesgo y el impacto que tendría si ocurriera.", "c) El número de defectos esperados en una parte específica del sistema.", "d) La gravedad de un defecto según la clasificación del sistema de gestión de defectos."],
+    correct: ["b"],
+    obj: "FL-5.x", k: "K2",
+    explanation: "El nivel de riesgo se calcula como la combinación de la probabilidad (posibilidad de que el evento de riesgo ocurra) y el impacto (consecuencias si el evento ocurre). Cuanto mayor sea la probabilidad y el impacto, mayor será el nivel de riesgo, y mayor prioridad deberá darse a la prueba de esa área."
+  },
+  {
+    id: 25, cap: 5,
+    text: "¿Cuál de los siguientes describe MEJOR la diferencia entre el seguimiento de pruebas (test monitoring) y el control de pruebas (test control)?\na) El seguimiento de pruebas recopila datos sobre el progreso de las pruebas; el control de pruebas toma acciones correctivas cuando el proceso se desvía del plan.\nb) El control de pruebas recopila datos sobre el progreso de las pruebas; el seguimiento de pruebas define las acciones correctivas necesarias.\nc) El seguimiento se realiza al principio del proyecto; el control se realiza al final.\nd) El seguimiento de pruebas lo realiza el tester; el control de pruebas lo realiza exclusivamente el director del proyecto.",
+    opts: ["a", "b", "c", "d"],
+    labels: ["a) El seguimiento de pruebas recopila datos sobre el progreso de las pruebas; el control de pruebas toma acciones correctivas cuando el proceso se desvía del plan.", "b) El control de pruebas recopila datos sobre el progreso de las pruebas; el seguimiento de pruebas define las acciones correctivas necesarias.", "c) El seguimiento se realiza al principio del proyecto; el control se realiza al final.", "d) El seguimiento de pruebas lo realiza el tester; el control de pruebas lo realiza exclusivamente el director del proyecto."],
+    correct: ["a"],
+    obj: "FL-5.x", k: "K2",
+    explanation: "El seguimiento de pruebas (monitoring) es el proceso continuo de recopilar información sobre el progreso de las pruebas y compararla con el plan. El control de pruebas (control) consiste en tomar acciones correctivas cuando el seguimiento revela desviaciones respecto al plan (p. ej., reasignar recursos, ajustar el alcance)."
+  },
+  {
+    id: 26, cap: 5,
+    text: "¿Cuál de los siguientes describe MEJOR qué se entiende por 'independencia de las pruebas'?\na) Los testers nunca deben comunicarse con los desarrolladores para mantener la objetividad.\nb) Las pruebas realizadas por personas distintas al desarrollador del código tienden a ser más objetivas y efectivas para encontrar defectos.\nc) Los testers independientes tienen siempre mayor competencia técnica que los desarrolladores.\nd) La independencia de pruebas requiere que el equipo de pruebas sea externo a la organización.",
+    opts: ["a", "b", "c", "d"],
+    labels: ["a) Los testers nunca deben comunicarse con los desarrolladores para mantener la objetividad.", "b) Las pruebas realizadas por personas distintas al desarrollador del código tienden a ser más objetivas y efectivas para encontrar defectos.", "c) Los testers independientes tienen siempre mayor competencia técnica que los desarrolladores.", "d) La independencia de pruebas requiere que el equipo de pruebas sea externo a la organización."],
+    correct: ["b"],
+    obj: "FL-5.x", k: "K2",
+    explanation: "La independencia de pruebas se refiere a que las pruebas realizadas por alguien distinto del autor del código son generalmente más objetivas. El sesgo de confirmación puede hacer que los autores no vean sus propios errores. La independencia puede ser interna (otro desarrollador) o externa (equipo de QA, terceros)."
+  },
+  {
+    id: 27, cap: 5,
+    text: "¿Cuál de los siguientes describe MEJOR las responsabilidades de un tester durante la fase de análisis de pruebas?\na) Diseñar los casos de prueba detallados y especificar los datos de prueba necesarios.\nb) Ejecutar los casos de prueba y registrar los resultados obtenidos.\nc) Analizar la base de prueba y definir las condiciones de prueba.\nd) Evaluar los criterios de salida y preparar el informe resumido de pruebas.",
+    opts: ["a", "b", "c", "d"],
+    labels: ["a) Diseñar los casos de prueba detallados y especificar los datos de prueba necesarios.", "b) Ejecutar los casos de prueba y registrar los resultados obtenidos.", "c) Analizar la base de prueba y definir las condiciones de prueba.", "d) Evaluar los criterios de salida y preparar el informe resumido de pruebas."],
+    correct: ["c"],
+    obj: "FL-5.x", k: "K2",
+    explanation: "Durante el análisis de pruebas, el tester analiza la base de prueba (requisitos, diseño, código, etc.) para identificar las condiciones de prueba (qué se debe probar). El diseño detallado de casos de prueba ocurre en la fase de diseño de pruebas, posterior al análisis."
+  },
+  {
+    id: 28, cap: 6,
+    text: "¿Cuál de los siguientes describe MEJOR los beneficios potenciales de la automatización de pruebas?\na) La automatización elimina la necesidad de testers humanos una vez configurada.\nb) La automatización permite ejecutar más pruebas de forma más rápida y repetible, especialmente para pruebas de regresión.\nc) Los casos de prueba automatizados siempre detectan más defectos que las pruebas manuales.\nd) La automatización de pruebas reduce el costo inicial de configuración del entorno de pruebas.",
+    opts: ["a", "b", "c", "d"],
+    labels: ["a) La automatización elimina la necesidad de testers humanos una vez configurada.", "b) La automatización permite ejecutar más pruebas de forma más rápida y repetible, especialmente para pruebas de regresión.", "c) Los casos de prueba automatizados siempre detectan más defectos que las pruebas manuales.", "d) La automatización de pruebas reduce el costo inicial de configuración del entorno de pruebas."],
+    correct: ["b"],
+    obj: "FL-6.x", k: "K2",
+    explanation: "Los principales beneficios de la automatización de pruebas incluyen mayor velocidad de ejecución, repetibilidad, posibilidad de ejecutar más pruebas, reducción del esfuerzo de regresión y ejecución en horario no laboral. No elimina la necesidad de testers humanos, que siguen siendo necesarios para diseño, análisis y pruebas exploratorias."
+  },
+  {
+    id: 29, cap: 6,
+    text: "¿Cuál de los siguientes describe MEJOR las limitaciones de las herramientas de análisis estático?\na) Las herramientas de análisis estático no pueden analizar código escrito en lenguajes modernos.\nb) Las herramientas de análisis estático pueden generar falsos positivos y no pueden detectar todos los tipos de defectos.\nc) Las herramientas de análisis estático solo pueden usarse por desarrolladores, no por testers.\nd) Las herramientas de análisis estático requieren que el código se ejecute para poder analizarlo.",
+    opts: ["a", "b", "c", "d"],
+    labels: ["a) Las herramientas de análisis estático no pueden analizar código escrito en lenguajes modernos.", "b) Las herramientas de análisis estático pueden generar falsos positivos y no pueden detectar todos los tipos de defectos.", "c) Las herramientas de análisis estático solo pueden usarse por desarrolladores, no por testers.", "d) Las herramientas de análisis estático requieren que el código se ejecute para poder analizarlo."],
+    correct: ["b"],
+    obj: "FL-6.x", k: "K2",
+    explanation: "Las herramientas de análisis estático tienen limitaciones: pueden generar falsos positivos (reportando problemas donde no los hay) y falsos negativos (no detectando defectos reales). No pueden detectar todos los tipos de defectos, especialmente los relacionados con el comportamiento en tiempo de ejecución."
+  },
+  {
+    id: 30, cap: 6,
+    text: "¿Cuál de los siguientes describe MEJOR el propósito de las herramientas de gestión de pruebas?\na) Automatizar la ejecución de casos de prueba.\nb) Apoyar la planificación, el seguimiento y el control de las actividades de prueba, gestionando casos de prueba, incidentes y métricas.\nc) Generar automáticamente casos de prueba a partir de los requisitos del sistema.\nd) Analizar el rendimiento del sistema bajo diferentes condiciones de carga.",
+    opts: ["a", "b", "c", "d"],
+    labels: ["a) Automatizar la ejecución de casos de prueba.", "b) Apoyar la planificación, el seguimiento y el control de las actividades de prueba, gestionando casos de prueba, incidentes y métricas.", "c) Generar automáticamente casos de prueba a partir de los requisitos del sistema.", "d) Analizar el rendimiento del sistema bajo diferentes condiciones de carga."],
+    correct: ["b"],
+    obj: "FL-6.x", k: "K2",
+    explanation: "Las herramientas de gestión de pruebas apoyan las actividades de planificación, seguimiento y control de las pruebas: almacenan y gestionan casos de prueba, registran el estado de la ejecución, rastrean defectos y métricas, y proporcionan informes de progreso para los stakeholders."
+  },
+  {
+    id: 31, cap: 4,
+    text: "¿Cuál de los siguientes describe MEJOR el concepto de 'cobertura de ramas' (branch coverage)?\na) El porcentaje de sentencias del código que han sido ejecutadas por los casos de prueba.\nb) El porcentaje de resultados de decisión (verdadero y falso) que han sido ejecutados por los casos de prueba.\nc) El porcentaje de caminos posibles a través del código que han sido ejecutados.\nd) El porcentaje de valores de entrada únicos que han sido probados.",
+    opts: ["a", "b", "c", "d"],
+    labels: ["a) El porcentaje de sentencias del código que han sido ejecutadas por los casos de prueba.", "b) El porcentaje de resultados de decisión (verdadero y falso) que han sido ejecutados por los casos de prueba.", "c) El porcentaje de caminos posibles a través del código que han sido ejecutados.", "d) El porcentaje de valores de entrada únicos que han sido probados."],
+    correct: ["b"],
+    obj: "FL-4.x", k: "K2",
+    explanation: "La cobertura de ramas (o cobertura de decisiones) mide el porcentaje de resultados posibles de cada decisión (verdadero/falso para sentencias condicionales, y cada posible salida de bucles y selecciones) que han sido ejercitados por los casos de prueba."
+  },
+  {
+    id: 32, cap: 3,
+    text: "¿Cuál de los siguientes describe MEJOR la diferencia entre una revisión técnica y una inspección?\na) Las revisiones técnicas no tienen moderador; las inspecciones siempre tienen un moderador designado.\nb) Las inspecciones son el tipo más formal de revisión, con roles definidos, criterios de entrada/salida, métricas y proceso estructurado; las revisiones técnicas son algo menos formales.\nc) Las revisiones técnicas se realizan exclusivamente por el equipo de desarrollo; las inspecciones las realizan testers externos.\nd) Las inspecciones solo se realizan en código; las revisiones técnicas pueden aplicarse a cualquier artefacto.",
+    opts: ["a", "b", "c", "d"],
+    labels: ["a) Las revisiones técnicas no tienen moderador; las inspecciones siempre tienen un moderador designado.", "b) Las inspecciones son el tipo más formal de revisión, con roles definidos, criterios de entrada/salida, métricas y proceso estructurado; las revisiones técnicas son algo menos formales.", "c) Las revisiones técnicas se realizan exclusivamente por el equipo de desarrollo; las inspecciones las realizan testers externos.", "d) Las inspecciones solo se realizan en código; las revisiones técnicas pueden aplicarse a cualquier artefacto."],
+    correct: ["b"],
+    obj: "FL-3.x", k: "K2",
+    explanation: "Las inspecciones son el tipo más formal de revisión estática. Tienen roles definidos (autor, moderador, lectores, escriba), criterios formales de entrada y salida, métricas recopiladas, y un proceso altamente estructurado. Las revisiones técnicas son menos formales, aunque más estructuradas que las walkthroughs."
+  },
+  {
+    id: 33, cap: 2,
+    text: "¿Cuál de los siguientes describe MEJOR el propósito de las pruebas de humo (smoke testing)?\na) Probar todas las funcionalidades del sistema de forma exhaustiva antes del lanzamiento.\nb) Verificar rápidamente que las funciones más críticas del sistema funcionan correctamente, antes de proceder a pruebas más extensas.\nc) Probar el sistema bajo condiciones de estrés para identificar puntos de fallo.\nd) Verificar que todos los defectos reportados han sido corregidos correctamente.",
+    opts: ["a", "b", "c", "d"],
+    labels: ["a) Probar todas las funcionalidades del sistema de forma exhaustiva antes del lanzamiento.", "b) Verificar rápidamente que las funciones más críticas del sistema funcionan correctamente, antes de proceder a pruebas más extensas.", "c) Probar el sistema bajo condiciones de estrés para identificar puntos de fallo.", "d) Verificar que todos los defectos reportados han sido corregidos correctamente."],
+    correct: ["b"],
+    obj: "FL-2.x", k: "K2",
+    explanation: "Las pruebas de humo (smoke testing) son pruebas superficiales diseñadas para verificar que las funcionalidades más críticas del sistema funcionan. Se ejecutan rápidamente al recibir una nueva build para decidir si merece la pena continuar con pruebas más extensas, o si la build debe rechazarse por tener fallos básicos."
+  },
+  {
+    id: 34, cap: 1,
+    text: "¿Cuál de los siguientes principios de prueba justifica la priorización de pruebas en áreas donde históricamente se han encontrado más defectos?\na) Las pruebas muestran la presencia de defectos, no su ausencia.\nb) Las pruebas exhaustivas son imposibles.\nc) La agrupación de defectos (defect clustering).\nd) La paradoja del pesticida.",
+    opts: ["a", "b", "c", "d"],
+    labels: ["a) Las pruebas muestran la presencia de defectos, no su ausencia.", "b) Las pruebas exhaustivas son imposibles.", "c) La agrupación de defectos (defect clustering).", "d) La paradoja del pesticida."],
+    correct: ["c"],
+    obj: "FL-1.x", k: "K2",
+    explanation: "El principio de agrupación de defectos indica que la mayoría de los defectos se concentran en un pequeño número de módulos. Esto justifica priorizar las pruebas en las áreas donde históricamente se han encontrado más defectos o donde la complejidad es mayor."
+  },
+  {
+    id: 35, cap: 2,
+    text: "¿Cuál de los siguientes describe MEJOR las pruebas alfa y beta como tipos de pruebas de aceptación?\na) Las pruebas alfa las realizan los clientes en las instalaciones del desarrollador; las pruebas beta las realizan clientes en sus propias instalaciones.\nb) Las pruebas alfa las realizan los desarrolladores; las pruebas beta las realizan los testers de QA.\nc) Las pruebas alfa se realizan antes de las pruebas de sistema; las pruebas beta se realizan después de las pruebas de aceptación.\nd) Tanto las pruebas alfa como las beta se realizan por el equipo de desarrollo interno, en diferentes fases del proyecto.",
+    opts: ["a", "b", "c", "d"],
+    labels: ["a) Las pruebas alfa las realizan los clientes en las instalaciones del desarrollador; las pruebas beta las realizan clientes en sus propias instalaciones.", "b) Las pruebas alfa las realizan los desarrolladores; las pruebas beta las realizan los testers de QA.", "c) Las pruebas alfa se realizan antes de las pruebas de sistema; las pruebas beta se realizan después de las pruebas de aceptación.", "d) Tanto las pruebas alfa como las beta se realizan por el equipo de desarrollo interno, en diferentes fases del proyecto."],
+    correct: ["a"],
+    obj: "FL-2.x", k: "K2",
+    explanation: "Las pruebas alfa son un tipo de prueba de aceptación realizadas por los usuarios potenciales o clientes en el entorno del desarrollador o en un entorno simulado. Las pruebas beta son realizadas por usuarios potenciales o clientes en sus propias instalaciones, sin la presencia del desarrollador."
+  },
+  {
+    id: 36, cap: 5,
+    text: "¿Cuál de los siguientes describe MEJOR cuándo debe detenerse la ejecución de pruebas según los criterios de salida?\na) Cuando se han ejecutado todos los casos de prueba planificados, independientemente de sus resultados.\nb) Cuando se han alcanzado los objetivos de prueba definidos, como el nivel de cobertura requerido y el número de defectos abiertos dentro del umbral aceptable.\nc) Cuando el presupuesto del proyecto de pruebas se ha agotado.\nd) Cuando todos los defectos detectados han sido corregidos y verificados.",
+    opts: ["a", "b", "c", "d"],
+    labels: ["a) Cuando se han ejecutado todos los casos de prueba planificados, independientemente de sus resultados.", "b) Cuando se han alcanzado los objetivos de prueba definidos, como el nivel de cobertura requerido y el número de defectos abiertos dentro del umbral aceptable.", "c) Cuando el presupuesto del proyecto de pruebas se ha agotado.", "d) Cuando todos los defectos detectados han sido corregidos y verificados."],
+    correct: ["b"],
+    obj: "FL-5.x", k: "K2",
+    explanation: "Los criterios de salida definen cuándo la actividad de prueba puede considerarse suficientemente completa. Esto incluye haber alcanzado el nivel de cobertura objetivo, tener el número de defectos abiertos dentro del umbral aceptable, haber agotado el riesgo de las áreas de prueba prioritarias, etc."
+  },
+  {
+    id: 37, cap: 4,
+    text: "¿Cuál de los siguientes describe MEJOR el propósito de la cobertura de sentencias en las pruebas de caja blanca?\na) Garantizar que todos los caminos posibles a través del código se han ejecutado.\nb) Garantizar que cada sentencia ejecutable del código ha sido ejecutada al menos una vez durante las pruebas.\nc) Garantizar que todas las condiciones de decisión han tomado todos los valores posibles.\nd) Garantizar que todos los valores de entrada se han usado al menos una vez.",
+    opts: ["a", "b", "c", "d"],
+    labels: ["a) Garantizar que todos los caminos posibles a través del código se han ejecutado.", "b) Garantizar que cada sentencia ejecutable del código ha sido ejecutada al menos una vez durante las pruebas.", "c) Garantizar que todas las condiciones de decisión han tomado todos los valores posibles.", "d) Garantizar que todos los valores de entrada se han usado al menos una vez."],
+    correct: ["b"],
+    obj: "FL-4.x", k: "K2",
+    explanation: "La cobertura de sentencias es una métrica de caja blanca que mide qué porcentaje de las sentencias ejecutables del código han sido ejecutadas por los casos de prueba. El objetivo de 100% de cobertura de sentencias significa que cada sentencia ejecutable se ha ejecutado al menos una vez."
+  },
+  {
+    id: 38, cap: 5,
+    text: "¿Cuál de los siguientes describe MEJOR el propósito de una estrategia de prueba?\na) Describir los casos de prueba específicos que deben ejecutarse para cada requisito del sistema.\nb) Proporcionar una descripción genérica del proceso de prueba y los principios que guían las decisiones de prueba en la organización.\nc) Definir el calendario detallado de las actividades de prueba para un proyecto específico.\nd) Especificar las herramientas de automatización que se utilizarán en el proyecto de pruebas.",
+    opts: ["a", "b", "c", "d"],
+    labels: ["a) Describir los casos de prueba específicos que deben ejecutarse para cada requisito del sistema.", "b) Proporcionar una descripción genérica del proceso de prueba y los principios que guían las decisiones de prueba en la organización.", "c) Definir el calendario detallado de las actividades de prueba para un proyecto específico.", "d) Especificar las herramientas de automatización que se utilizarán en el proyecto de pruebas."],
+    correct: ["b"],
+    obj: "FL-5.x", k: "K2",
+    explanation: "Una estrategia de prueba describe el enfoque general de prueba a nivel organizativo o de proyecto: los tipos de pruebas a utilizar, los niveles de prueba, las técnicas de diseño de pruebas, los criterios de entrada y salida, etc. Es más abstracta que el plan de prueba, que es específico para un proyecto."
+  },
+  {
+    id: 39, cap: 6,
+    text: "¿Cuál de los siguientes describe MEJOR qué es una 'herramienta de prueba de rendimiento'?\na) Una herramienta que mide la cobertura del código durante la ejecución de pruebas.\nb) Una herramienta que simula múltiples usuarios o transacciones para medir el comportamiento del sistema bajo carga.\nc) Una herramienta que gestiona los casos de prueba y rastrea los defectos encontrados.\nd) Una herramienta que genera automáticamente datos de prueba para pruebas funcionales.",
+    opts: ["a", "b", "c", "d"],
+    labels: ["a) Una herramienta que mide la cobertura del código durante la ejecución de pruebas.", "b) Una herramienta que simula múltiples usuarios o transacciones para medir el comportamiento del sistema bajo carga.", "c) Una herramienta que gestiona los casos de prueba y rastrea los defectos encontrados.", "d) Una herramienta que genera automáticamente datos de prueba para pruebas funcionales."],
+    correct: ["b"],
+    obj: "FL-6.x", k: "K2",
+    explanation: "Las herramientas de prueba de rendimiento (como JMeter o Gatling) simulan múltiples usuarios concurrentes o grandes volúmenes de transacciones para medir el comportamiento del sistema bajo diferentes niveles de carga: tiempos de respuesta, throughput, uso de recursos, y puntos de ruptura."
+  },
+  {
+    id: 40, cap: 5,
+    text: "¿Cuál de los siguientes describe MEJOR la diferencia entre un plan de prueba (test plan) y una estrategia de prueba (test strategy)?\na) El plan de prueba es más abstracto y cubre toda la organización; la estrategia de prueba es específica para un proyecto.\nb) La estrategia de prueba es más abstracta y puede aplicarse a varios proyectos; el plan de prueba es específico para un proyecto y detalla cómo se implementará la estrategia.\nc) El plan de prueba y la estrategia de prueba son documentos equivalentes usados indistintamente.\nd) La estrategia de prueba define los casos de prueba específicos; el plan de prueba define el calendario de ejecución.",
+    opts: ["a", "b", "c", "d"],
+    labels: ["a) El plan de prueba es más abstracto y cubre toda la organización; la estrategia de prueba es específica para un proyecto.", "b) La estrategia de prueba es más abstracta y puede aplicarse a varios proyectos; el plan de prueba es específico para un proyecto y detalla cómo se implementará la estrategia.", "c) El plan de prueba y la estrategia de prueba son documentos equivalentes usados indistintamente.", "d) La estrategia de prueba define los casos de prueba específicos; el plan de prueba define el calendario de ejecución."],
+    correct: ["b"],
+    obj: "FL-5.x", k: "K2",
+    explanation: "La estrategia de prueba describe el enfoque general a nivel organizativo o de programa (qué tipos de pruebas, qué técnicas, qué estándares). El plan de prueba es un documento específico para un proyecto que describe cómo se implementará la estrategia: qué se probará, quién lo hará, cuándo, con qué recursos y criterios."
+  },
+];
+
+const NOTA_APROBACION = 65;
+
+let state = {
+  mode:'exam', set:'main', questions:[], current:0,
+  answers:{}, flags:new Set(), timer:null, timeLeft:0, finished:false
+};
+function getQuestionSet(s){
+  if(s==='main') return QUESTIONS.slice(0,40);
+  if(s==='extra') return QUESTIONS.slice(40);
+  return QUESTIONS;
+}
+function selectMode(el,mode){document.querySelectorAll('.mode-card').forEach(c=>c.classList.remove('selected'));el.classList.add('selected');state.mode=mode;}
+function selectSet(el,set){document.querySelectorAll('.set-btn').forEach(b=>b.classList.remove('selected'));el.classList.add('selected');state.set=set;}
+function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');}
+function goToStart(){clearInterval(state.timer);state.finished=false;showScreen('startScreen');}
+function startExam(){
+  state.questions=[...getQuestionSet(state.set)];
+  state.current=0;state.answers={};state.flags=new Set();state.finished=false;
+  state.timeLeft=state.mode==='exam'?65*60:0;
+  document.getElementById('headerSub').textContent=state.questions.length+' preguntas · '+(state.mode==='exam'?'Modo Examen':'Modo Práctica');
+  showScreen('examScreen');buildDotNav();renderQuestion();
+  if(state.mode==='exam')startTimer();else document.getElementById('timerDisplay').textContent='';
+}
+function startTimer(){
+  clearInterval(state.timer);
+  state.timer=setInterval(()=>{state.timeLeft--;updateTimer();if(state.timeLeft<=0){clearInterval(state.timer);finishExam();}},1000);
+  updateTimer();
+}
+function updateTimer(){
+  const m=Math.floor(state.timeLeft/60).toString().padStart(2,'0'),s=(state.timeLeft%60).toString().padStart(2,'0');
+  const el=document.getElementById('timerDisplay');el.textContent=m+':'+s;
+  el.className='timer';if(state.timeLeft<300)el.classList.add('warning');if(state.timeLeft<60){el.classList.remove('warning');el.classList.add('danger');}
+}
+function buildDotNav(){
+  const nav=document.getElementById('dotNav');nav.innerHTML='';
+  state.questions.forEach((q,i)=>{const d=document.createElement('div');d.className='dot';d.textContent=typeof q.id==='number'?q.id:q.id;d.onclick=()=>{state.current=i;renderQuestion();};nav.appendChild(d);});
+}
+function updateDots(){
+  const dots=document.querySelectorAll('.dot');
+  dots.forEach((d,i)=>{d.className='dot';const q=state.questions[i];if(state.answers[q.id]&&state.answers[q.id].length>0)d.classList.add('answered');if(state.flags.has(q.id))d.classList.add('flagged');if(i===state.current)d.classList.add('current');});
+}
+function renderQuestion(){
+  const q=state.questions[state.current],total=state.questions.length;
+  document.getElementById('qCounter').textContent='Pregunta '+(state.current+1)+' de '+total;
+  document.getElementById('progressFill').style.width=(((state.current+1)/total)*100)+'%';
+  const isMulti=q.correct.length>1,selected=state.answers[q.id]||[],isAnswered=selected.length>0;
+  const showFeedback=state.mode==='practice'&&isAnswered;
+  let html='<div class="q-badge">Cap. '+q.cap+' · '+q.obj+' · '+q.k+'</div>';
+  if(isMulti)html+='<div class="multi-hint">⚡ Seleccioná '+q.correct.length+' respuestas</div>';
+  html+='<div class="q-text">'+q.text+'</div><div class="options">';
+  q.labels.forEach((label,idx)=>{
+    const letter=q.opts[idx];let cls='option';
+    if(showFeedback){cls+=' disabled';if(q.correct.includes(letter))cls+=' correct';else if(selected.includes(letter))cls+=' wrong';}
+    else if(!isAnswered||state.finished){if(selected.includes(letter))cls+=' selected-option';if(state.finished)cls+=' disabled';}
+    else{cls+=' disabled';if(selected.includes(letter))cls+=' selected-option';}
+    html+='<div class="'+cls+'" onclick="selectOption('+q.id+',\''+letter+'\','+isMulti+')"><span class="opt-letter">'+letter.toUpperCase()+'</span><span>'+label+'</span></div>';
+  });
+  html+='</div>';
+  if(showFeedback){
+    const isCorrect=JSON.stringify([...selected].sort())===JSON.stringify([...q.correct].sort());
+    html+='<div class="explanation visible"><strong>'+(isCorrect?'✓ Correcto':'✗ Incorrecto — Respuesta correcta: '+q.correct.join(', ').toUpperCase())+'</strong>'+q.explanation+'<div class="obj">🎯 Objetivo: '+q.obj+'</div></div>';
+  }
+  document.getElementById('questionCard').innerHTML=html;
+  document.getElementById('prevBtn').disabled=state.current===0;
+  const isLast=state.current===total-1;
+  document.getElementById('nextBtn').style.display=isLast?'none':'inline-block';
+  document.getElementById('finishBtn').style.display=isLast?'inline-block':'none';
+  const fb=document.getElementById('flagBtn');
+  fb.className=state.flags.has(q.id)?'flag-btn flagged':'flag-btn';
+  fb.textContent=state.flags.has(q.id)?'🚩 Marcada':'🚩 Marcar';
+  updateDots();
+}
+function selectOption(qId,letter,isMulti){
+  if(state.finished)return;
+  if(state.mode==='practice'&&state.answers[qId]&&state.answers[qId].length>0)return;
+  let sel=state.answers[qId]?[...state.answers[qId]]:[];
+  if(isMulti){if(sel.includes(letter))sel=sel.filter(l=>l!==letter);else sel.push(letter);if(sel.length>state.questions.find(q=>q.id==qId).correct.length)sel.shift();}
+  else sel=[letter];
+  state.answers[qId]=sel;renderQuestion();
+}
+function navigate(dir){state.current=Math.max(0,Math.min(state.questions.length-1,state.current+dir));renderQuestion();}
+function toggleFlag(){const q=state.questions[state.current];if(state.flags.has(q.id))state.flags.delete(q.id);else state.flags.add(q.id);renderQuestion();}
+function finishExam(){clearInterval(state.timer);state.finished=true;showResults();}
+function showResults(){
+  showScreen('resultsScreen');
+  const qs=state.questions;let correct=0,wrong=0,skipped=0;const byChapter={};
+  qs.forEach(q=>{
+    if(!byChapter[q.cap])byChapter[q.cap]={total:0,correct:0};byChapter[q.cap].total++;
+    const sel=state.answers[q.id]||[];if(sel.length===0){skipped++;return;}
+    const isOk=JSON.stringify([...sel].sort())===JSON.stringify([...q.correct].sort());
+    if(isOk){correct++;byChapter[q.cap].correct++;}else wrong++;
+  });
+  const total=qs.length,pct=Math.round((correct/total)*100),pass=pct>=NOTA_APROBACION;
+  document.getElementById('resultHero').innerHTML=
+    '<div class="score-circle '+(pass?'pass':'fail')+'">'
+    +'<div class="pct">'+pct+'%</div><div class="label">'+correct+'/'+total+'</div></div>'
+    +'<div class="verdict '+(pass?'pass':'fail')+'">'+(pass?'🎉 ¡APROBADO!':'😔 No aprobado')+'</div>'
+    +'<div class="result-note">Se necesita el '+NOTA_APROBACION+'% para aprobar · ('+Math.ceil(total*NOTA_APROBACION/100)+'/'+total+' correctas)</div>'
+    +'<div class="result-stats">'
+    +'<div class="rs correct"><div class="n">'+correct+'</div><div class="l">Correctas</div></div>'
+    +'<div class="rs wrong"><div class="n">'+wrong+'</div><div class="l">Incorrectas</div></div>'
+    +'<div class="rs skipped"><div class="n">'+skipped+'</div><div class="l">Sin resp.</div></div>'
+    +'</div>'
+    +'<div class="result-actions">'
+    +'<button class="primary-btn" onclick="startExam()">🔁 Volver a intentar</button>'
+    +'<button onclick="goToStart()">🏠 Inicio</button>'
+    +'</div>';
+  let bHtml='<h3>📊 Resultado por capítulo</h3>';
+  Object.keys(byChapter).sort().forEach(cap=>{
+    const d=byChapter[cap],cpct=d.total>0?Math.round((d.correct/d.total)*100):0;
+    bHtml+='<div class="ch-row"><div class="ch-label">Cap. '+cap+'</div><div class="ch-bar-wrap"><div class="ch-bar" style="width:'+cpct+'%;background:'+(cpct>=NOTA_APROBACION?'var(--green)':'var(--red)')+'"></div></div><div class="ch-score">'+d.correct+'/'+d.total+'</div></div>';
+  });
+  document.getElementById('chBreakdown').innerHTML=bHtml;
+  let rHtml='<h3>📋 Revisión de respuestas</h3>';
+  const sorted=[...qs].sort((a,b)=>{
+    const aOk=(state.answers[a.id]||[]).length>0&&JSON.stringify([...(state.answers[a.id]||[])].sort())===JSON.stringify([...a.correct].sort());
+    const bOk=(state.answers[b.id]||[]).length>0&&JSON.stringify([...(state.answers[b.id]||[])].sort())===JSON.stringify([...b.correct].sort());
+    return(aOk?1:0)-(bOk?1:0);
+  });
+  sorted.forEach(q=>{
+    const sel=state.answers[q.id]||[];
+    const isOk=sel.length>0&&JSON.stringify([...sel].sort())===JSON.stringify([...q.correct].sort());
+    const isSkip=sel.length===0;
+    rHtml+='<div class="review-item"><div class="ri-status '+(isSkip?'sk':isOk?'ok':'no')+'">'+(isSkip?'—':isOk?'✓':'✗')+'</div>'
+      +'<div class="ri-body"><div class="ri-qtext">'+q.id+'. '+q.text.split('\n')[0]+'</div>'
+      +'<div class="ri-answer">'
+      +(isSkip?'<span class="got">Sin respuesta</span>':'')
+      +(!isSkip&&!isOk?'<span class="got">Tuya: '+sel.join(',').toUpperCase()+'</span> · ':'')
+      +'<span class="expected">Correcta: '+q.correct.join(',').toUpperCase()+'</span>'
+      +(isOk?'':' · <small style="color:var(--gray-mid)">'+q.explanation.substring(0,80)+'…</small>')
+      +'</div></div></div>';
+  });
+  document.getElementById('reviewList').innerHTML=rHtml;
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,997 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ISTQB FL — Simulador Modelo A</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --red:#0A66C2;--red-dark:#004182;--red-light:#E8F1FB;
+  --dark:#1A1A1A;--gray:#4A4A4A;--gray-mid:#7A7A7A;--gray-light:#F4F4F4;--border:#E0E0E0;
+  --white:#FFFFFF;--green:#2E7D32;--green-light:#E8F5E9;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Montserrat',system-ui,sans-serif;background:var(--gray-light);color:var(--dark);font-size:14px;min-height:100vh;}
+
+/* NAV */
+.nav{background:var(--dark);padding:0 2rem;display:flex;align-items:center;position:sticky;top:0;z-index:100;height:60px;gap:0;}
+.nav-logo{display:flex;align-items:center;gap:10px;padding-right:1.5rem;border-right:1px solid #333;margin-right:1.5rem;}
+.nav-logo-text{font-size:13px;font-weight:700;color:var(--white);letter-spacing:.08em;text-transform:uppercase;}
+.nav-logo-sub{font-size:10px;color:var(--red);letter-spacing:.1em;text-transform:uppercase;margin-top:1px;}
+.nav-right{margin-left:auto;display:flex;align-items:center;gap:10px;}
+.nav-meta{font-size:11px;color:#999;letter-spacing:.04em;}
+.nav-btn{font-size:11px;padding:.4rem 1rem;border:1px solid #444;border-radius:3px;color:#ccc;background:none;cursor:pointer;font-family:inherit;text-transform:uppercase;letter-spacing:.06em;font-weight:600;transition:all .15s;}
+.nav-btn:hover{border-color:var(--red);color:var(--white);}
+
+/* HERO */
+.hero{background:var(--dark);padding:2rem 2rem 1.75rem;border-bottom:3px solid var(--red);}
+.hero-tag{font-size:10px;font-weight:700;color:var(--red);letter-spacing:.15em;text-transform:uppercase;margin-bottom:.4rem;}
+.hero-title{font-size:20px;font-weight:700;color:var(--white);letter-spacing:.01em;margin-bottom:.3rem;}
+.hero-title span{color:var(--red);}
+.hero-sub{font-size:12px;color:#999;}
+
+/* SCREENS */
+.screen{display:none;}
+.screen.active{display:block;}
+
+/* START SCREEN */
+.start-wrap{max-width:640px;margin:2.5rem auto;padding:0 1.5rem;}
+.start-card{background:var(--white);border:1px solid var(--border);border-radius:4px;padding:2rem;}
+.start-card-title{font-size:16px;font-weight:700;color:var(--dark);margin-bottom:.3rem;}
+.start-card-sub{font-size:12px;color:var(--gray-mid);margin-bottom:1.75rem;line-height:1.6;}
+.stats-row{display:flex;gap:0;margin-bottom:1.75rem;border:1px solid var(--border);border-radius:3px;overflow:hidden;}
+.stat{flex:1;text-align:center;padding:.9rem .5rem;border-right:1px solid var(--border);}
+.stat:last-child{border-right:none;}
+.stat .n{font-size:1.4rem;font-weight:700;color:var(--red);line-height:1;}
+.stat .l{font-size:9px;font-weight:600;color:var(--gray-mid);text-transform:uppercase;letter-spacing:.06em;margin-top:3px;}
+
+.section-label{font-size:10px;font-weight:700;color:var(--red);letter-spacing:.15em;text-transform:uppercase;margin-bottom:.5rem;}
+.set-options{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:1.25rem;}
+.set-btn{background:var(--white);border:1px solid var(--border);color:var(--gray-mid);padding:.45rem 1rem;border-radius:3px;cursor:pointer;font-size:11px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;font-family:inherit;transition:all .15s;}
+.set-btn:hover{border-color:var(--dark);color:var(--dark);}
+.set-btn.selected{background:var(--dark);border-color:var(--dark);color:var(--white);}
+
+.mode-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:1.75rem;}
+.mode-card{background:var(--gray-light);border:1px solid var(--border);border-radius:3px;padding:1rem;cursor:pointer;transition:all .15s;}
+.mode-card:hover,.mode-card.selected{border-color:var(--red);background:var(--red-light);}
+.mode-card .icon{font-size:1.4rem;margin-bottom:.4rem;}
+.mode-card h3{font-size:12px;font-weight:700;color:var(--dark);margin-bottom:2px;text-transform:uppercase;letter-spacing:.04em;}
+.mode-card p{font-size:11px;color:var(--gray-mid);line-height:1.5;}
+.mode-card.selected h3{color:var(--red);}
+
+.start-btn{background:var(--red);color:var(--white);border:none;padding:.75rem 2rem;border-radius:3px;font-size:13px;font-weight:700;cursor:pointer;width:100%;font-family:inherit;text-transform:uppercase;letter-spacing:.08em;transition:background .15s;}
+.start-btn:hover{background:var(--red-dark);}
+
+/* EXAM SCREEN */
+.exam-wrap{max-width:820px;margin:0 auto;padding:1.5rem 1.5rem 5rem;}
+.progress-bar-wrap{background:var(--border);height:3px;margin-bottom:1.25rem;}
+.progress-bar-fill{background:var(--red);height:3px;transition:width .4s;}
+.exam-meta{display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;flex-wrap:wrap;gap:8px;}
+.exam-meta-left{font-size:11px;color:var(--gray-mid);font-weight:600;text-transform:uppercase;letter-spacing:.06em;}
+.timer{font-size:13px;font-weight:700;color:var(--dark);font-variant-numeric:tabular-nums;}
+.timer.warning{color:#C05C00;}
+.timer.danger{color:var(--red);}
+.flag-btn{background:none;border:1px solid var(--border);color:var(--gray-mid);padding:.35rem .8rem;border-radius:3px;cursor:pointer;font-size:11px;font-weight:600;font-family:inherit;text-transform:uppercase;letter-spacing:.04em;transition:all .15s;}
+.flag-btn.flagged{border-color:var(--red);color:var(--red);background:var(--red-light);}
+
+/* DOT NAV */
+.dot-nav{background:var(--white);border:1px solid var(--border);border-radius:3px;padding:10px 12px;margin-bottom:1rem;display:flex;flex-wrap:wrap;gap:4px;}
+.dot{width:26px;height:26px;border-radius:3px;border:1px solid var(--border);background:var(--gray-light);cursor:pointer;font-size:10px;font-weight:700;color:var(--gray-mid);display:flex;align-items:center;justify-content:center;transition:all .12s;position:relative;}
+.dot:hover{border-color:var(--dark);}
+.dot.answered{background:var(--red-light);border-color:var(--red);color:var(--red);}
+.dot.current{background:var(--dark);border-color:var(--dark);color:var(--white);}
+.dot.flagged::after{content:'';position:absolute;top:2px;right:2px;width:4px;height:4px;background:var(--red);border-radius:50%;}
+
+/* QUESTION CARD */
+.q-card{background:var(--white);border:1px solid var(--border);border-radius:4px;border-left:3px solid var(--red);padding:1.5rem 1.75rem;margin-bottom:1rem;}
+.q-badge{display:inline-flex;align-items:center;gap:6px;font-size:9px;font-weight:700;color:var(--gray-mid);background:var(--gray-light);border:1px solid var(--border);padding:2px 9px;border-radius:99px;text-transform:uppercase;letter-spacing:.06em;margin-bottom:.85rem;}
+.multi-hint{font-size:11px;color:var(--red);font-weight:600;margin-bottom:.75rem;display:flex;align-items:center;gap:5px;text-transform:uppercase;letter-spacing:.04em;}
+.q-text{font-size:13px;line-height:1.75;font-weight:500;margin-bottom:1.1rem;white-space:pre-wrap;color:var(--dark);}
+.options{display:flex;flex-direction:column;gap:7px;}
+.option{background:var(--gray-light);border:1px solid var(--border);border-radius:3px;padding:.75rem 1rem;cursor:pointer;display:flex;align-items:flex-start;gap:10px;transition:all .15s;font-size:12px;line-height:1.55;}
+.option:hover:not(.disabled){border-color:var(--dark);background:var(--white);}
+.option.selected-option{border-color:var(--dark);background:var(--white);}
+.option.correct{border-color:var(--green);background:var(--green-light);}
+.option.wrong{border-color:var(--red);background:var(--red-light);}
+.option.disabled{cursor:default;}
+.opt-letter{min-width:22px;height:22px;background:var(--border);border-radius:2px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;margin-top:1px;color:var(--gray);}
+.option.selected-option .opt-letter{background:var(--dark);color:var(--white);}
+.option.correct .opt-letter{background:var(--green);color:var(--white);}
+.option.wrong .opt-letter{background:var(--red);color:var(--white);}
+
+/* EXPLANATION */
+.explanation{background:var(--gray-light);border:1px solid var(--border);border-left:3px solid var(--green);border-radius:0 3px 3px 0;padding:.85rem 1rem;margin-top:.85rem;font-size:11px;line-height:1.7;display:none;color:var(--gray);}
+.explanation.visible{display:block;}
+.explanation strong{color:var(--dark);display:block;margin-bottom:3px;font-size:12px;}
+.explanation .obj{margin-top:6px;font-size:10px;color:var(--gray-mid);text-transform:uppercase;letter-spacing:.04em;}
+
+/* NAV ROW */
+.nav-row{display:flex;gap:8px;justify-content:space-between;margin-top:.85rem;}
+.nav-btn2{background:var(--white);border:1px solid var(--border);color:var(--gray);padding:.6rem 1.25rem;border-radius:3px;cursor:pointer;font-size:11px;font-weight:700;font-family:inherit;text-transform:uppercase;letter-spacing:.06em;transition:all .15s;}
+.nav-btn2:hover{border-color:var(--dark);color:var(--dark);}
+.nav-btn2.primary{background:var(--red);border-color:var(--red);color:var(--white);}
+.nav-btn2.primary:hover{background:var(--red-dark);}
+.nav-btn2.finish{background:var(--green);border-color:var(--green);color:var(--white);}
+.nav-btn2.finish:hover{background:#256029;}
+.nav-btn2:disabled{opacity:.35;cursor:default;}
+
+/* RESULTS */
+.results-wrap{max-width:760px;margin:2rem auto;padding:0 1.5rem 5rem;}
+.result-hero{background:var(--white);border:1px solid var(--border);border-left:3px solid var(--red);border-radius:4px;padding:2rem;text-align:center;margin-bottom:1rem;}
+.score-circle{width:120px;height:120px;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;margin:0 auto 1rem;border:3px solid var(--border);}
+.score-circle.pass{border-color:var(--green);}
+.score-circle.fail{border-color:var(--red);}
+.score-circle .pct{font-size:2rem;font-weight:800;line-height:1;}
+.score-circle.pass .pct{color:var(--green);}
+.score-circle.fail .pct{color:var(--red);}
+.score-circle .label{font-size:10px;color:var(--gray-mid);text-transform:uppercase;letter-spacing:.04em;margin-top:2px;}
+.verdict{font-size:1.3rem;font-weight:700;margin-bottom:6px;}
+.verdict.pass{color:var(--green);}
+.verdict.fail{color:var(--red);}
+.result-note{color:var(--gray-mid);font-size:11px;margin-bottom:1.25rem;}
+.result-stats{display:flex;justify-content:center;gap:0;margin-bottom:1.25rem;border:1px solid var(--border);border-radius:3px;overflow:hidden;max-width:360px;margin-left:auto;margin-right:auto;}
+.rs{flex:1;text-align:center;padding:.75rem .5rem;border-right:1px solid var(--border);}
+.rs:last-child{border-right:none;}
+.rs .n{font-size:1.3rem;font-weight:700;}
+.rs .l{font-size:9px;font-weight:600;color:var(--gray-mid);text-transform:uppercase;letter-spacing:.05em;margin-top:2px;}
+.rs.correct .n{color:var(--green);}
+.rs.wrong .n{color:var(--red);}
+.rs.skipped .n{color:var(--gray-mid);}
+.result-actions{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;}
+.result-actions button{background:var(--white);border:1px solid var(--border);color:var(--gray);padding:.55rem 1.25rem;border-radius:3px;cursor:pointer;font-size:11px;font-weight:700;font-family:inherit;text-transform:uppercase;letter-spacing:.06em;transition:all .15s;}
+.result-actions button:hover{border-color:var(--dark);color:var(--dark);}
+.result-actions .primary-btn{background:var(--red);border-color:var(--red);color:var(--white);}
+.result-actions .primary-btn:hover{background:var(--red-dark);}
+
+/* BREAKDOWN */
+.breakdown{background:var(--white);border:1px solid var(--border);border-radius:4px;padding:1.25rem 1.5rem;margin-bottom:.75rem;}
+.breakdown h3{font-size:10px;font-weight:700;color:var(--red);letter-spacing:.15em;text-transform:uppercase;margin-bottom:1rem;}
+.ch-row{display:flex;align-items:center;gap:10px;margin-bottom:9px;}
+.ch-label{min-width:80px;font-size:11px;color:var(--gray-mid);font-weight:600;text-transform:uppercase;letter-spacing:.03em;}
+.ch-bar-wrap{flex:1;background:var(--gray-light);border-radius:99px;height:6px;}
+.ch-bar{height:6px;border-radius:99px;transition:width .8s;}
+.ch-score{min-width:44px;text-align:right;font-size:11px;font-weight:700;color:var(--dark);}
+
+/* REVIEW LIST */
+.review-list{background:var(--white);border:1px solid var(--border);border-radius:4px;overflow:hidden;}
+.review-list h3{font-size:10px;font-weight:700;color:var(--red);letter-spacing:.15em;text-transform:uppercase;padding:1rem 1.25rem;border-bottom:1px solid var(--border);}
+.review-item{padding:.85rem 1.25rem;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;gap:10px;}
+.review-item:last-child{border-bottom:none;}
+.ri-status{width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;flex-shrink:0;margin-top:1px;font-weight:700;}
+.ri-status.ok{background:var(--green-light);color:var(--green);}
+.ri-status.no{background:var(--red-light);color:var(--red);}
+.ri-status.sk{background:var(--gray-light);color:var(--gray-mid);}
+.ri-body{flex:1;}
+.ri-qtext{font-size:11px;color:var(--gray);margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:520px;}
+.ri-answer{font-size:11px;}
+.ri-answer .got{color:var(--red);font-weight:600;}
+.ri-answer .expected{color:var(--green);font-weight:600;}
+
+@media(max-width:600px){
+  .mode-grid{grid-template-columns:1fr;}
+  .exam-wrap,.results-wrap,.start-wrap{padding:1rem 1rem 4rem;}
+  .stats-row{flex-wrap:wrap;}
+  .nav-logo-sub{display:none;}
+}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-logo">
+    <div class="nav-logo-text">ISTQB FL</div>
+  </div>
+  <div class="nav-right">
+    <span class="nav-meta" id="headerSub"></span>
+    <button class="nav-btn" onclick="goToStart()">← Volver</button>
+  </div>
+</nav>
+
+<div class="hero">
+  <div class="hero-tag">Certificación · ISTQB Foundation Level v4.0</div>
+  <div class="hero-title">Simulador <span>Modelo A</span></div>
+  <div class="hero-sub">40 preguntas oficiales + 26 adicionales ISTQB CTFL v4.0</div>
+</div>
+
+<!-- START -->
+<div id="startScreen" class="screen active">
+  <div class="start-wrap">
+    <div class="start-card">
+      <div class="start-card-title">Simulador Examen — Modelo A</div>
+      <div class="start-card-sub">40 preguntas oficiales + 26 adicionales ISTQB CTFL v4.0</div>
+      <div class="stats-row"><div class="stat"><div class="n">40</div><div class="l">Oficiales</div></div>
+        <div class="stat"><div class="n">26</div><div class="l">Adicionales</div></div>
+        <div class="stat"><div class="n">65%</div><div class="l">Aprobación</div></div>
+        <div class="stat"><div class="n">65&#8217;</div><div class="l">Tiempo</div></div></div>
+
+      <div class="section-label">Set de preguntas</div>
+      <div class="set-options"><button class="set-btn selected" data-set="main" onclick="selectSet(this,'main')">40 Oficiales</button>
+        <button class="set-btn" data-set="all" onclick="selectSet(this,'all')">66 Completo</button>
+        <button class="set-btn" data-set="extra" onclick="selectSet(this,'extra')">26 Adicionales</button></div>
+
+      <div class="section-label">Modo</div>
+      <div class="mode-grid">
+        <div class="mode-card selected" data-mode="exam" onclick="selectMode(this,'exam')">
+          <div class="icon">⏱️</div>
+          <h3>Examen</h3>
+          <p>Cronómetro 65 min. Respuestas al finalizar.</p>
+        </div>
+        <div class="mode-card" data-mode="practice" onclick="selectMode(this,'practice')">
+          <div class="icon">📖</div>
+          <h3>Práctica</h3>
+          <p>Sin tiempo. Feedback inmediato con explicación.</p>
+        </div>
+      </div>
+      <button class="start-btn" onclick="startExam()">Comenzar →</button>
+    </div>
+  </div>
+</div>
+
+<!-- EXAM -->
+<div id="examScreen" class="screen">
+  <div class="exam-wrap">
+    <div class="progress-bar-wrap"><div class="progress-bar-fill" id="progressFill" style="width:0%"></div></div>
+    <div class="exam-meta">
+      <span class="exam-meta-left" id="qCounter">Pregunta 1 de 40</span>
+      <span class="timer" id="timerDisplay">65:00</span>
+      <button class="flag-btn" id="flagBtn" onclick="toggleFlag()">🚩 Marcar</button>
+    </div>
+    <div class="dot-nav" id="dotNav"></div>
+    <div class="q-card" id="questionCard"></div>
+    <div class="nav-row">
+      <button class="nav-btn2" id="prevBtn" onclick="navigate(-1)">← Anterior</button>
+      <button class="nav-btn2 primary" id="nextBtn" onclick="navigate(1)">Siguiente →</button>
+      <button class="nav-btn2 finish" id="finishBtn" style="display:none" onclick="finishExam()">Finalizar</button>
+    </div>
+  </div>
+</div>
+
+<!-- RESULTS -->
+<div id="resultsScreen" class="screen">
+  <div class="results-wrap">
+    <div class="result-hero" id="resultHero"></div>
+    <div class="breakdown" id="chBreakdown"></div>
+    <div class="review-list" id="reviewList"></div>
+  </div>
+</div>
+
+<script>
+const QUESTIONS = [
+  // ──────────────── PREGUNTAS 1-40 (Oficiales) ────────────────
+  {
+    id: 1, cap: 1,
+    text: "¿Cuál de las siguientes afirmaciones describe MEJOR el objetivo de las pruebas?\na) Demostrar que no hay defectos en el sistema\nb) Demostrar que el sistema funcionará perfectamente en producción\nc) Reducir el nivel de riesgo y dar confianza respecto al nivel de calidad del objeto de prueba\nd) Probar todas las combinaciones de entradas posibles",
+    opts: ["a","b","c","d"],
+    labels: ["a) Demostrar que no hay defectos en el sistema","b) Demostrar que el sistema funcionará perfectamente en producción","c) Reducir el nivel de riesgo y dar confianza respecto al nivel de calidad del objeto de prueba","d) Probar todas las combinaciones de entradas posibles"],
+    correct: ["c"],
+    obj: "FL-1.1.1", k: "K1",
+    explanation: "Las pruebas encuentran defectos y fallos, lo que reduce el nivel de riesgo y da más confianza respecto al nivel de calidad del objeto de prueba. Es imposible demostrar ausencia de defectos (principio 1) ni probar todas las entradas (principio 2)."
+  },
+  {
+    id: 2, cap: 1,
+    text: "¿Cuál de las siguientes afirmaciones describe MEJOR la razón por la que la participación temprana de los probadores es importante?\na) Los probadores pueden mejorar la comprensión de las decisiones de diseño y detectar defectos en fase temprana\nb) Tanto desarrolladores como probadores comprenderán mejor el trabajo del otro\nc) Los probadores pueden trabajar estrechamente con los diseñadores del sistema\nd) Las pruebas no tendrán éxito si no se prueba el cumplimiento de requisitos legales",
+    opts: ["a","b","c","d"],
+    labels: ["a) Los probadores pueden mejorar la comprensión de las decisiones de diseño y detectar defectos en fase temprana","b) Tanto desarrolladores como probadores comprenderán mejor el trabajo del otro","c) Los probadores pueden trabajar estrechamente con los diseñadores del sistema","d) Las pruebas no tendrán éxito si no se prueba el cumplimiento de requisitos legales"],
+    correct: ["a"],
+    obj: "FL-1.2.1", k: "K2",
+    explanation: "Es importante que los probadores participen desde el principio del CVDS. Esta participación permitirá mejorar la comprensión de las decisiones de diseño y detectar los defectos en una fase temprana."
+  },
+  {
+    id: 3, cap: 1,
+    text: "En el último proyecto, todas las pruebas pasaron tanto en la entrega actual como en la anterior, pero se encontraron muchos defectos en producción. ¿Cuál de los siguientes principios de prueba explica MEJOR esta situación?\na) Las pruebas dependen del contexto: los pesticidas paradox hacen que las mismas pruebas dejen de detectar nuevos defectos\nb) La ausencia de errores es una falacia: encontrar y corregir muchos defectos asegura el éxito\nc) La agrupación de defectos: un pequeño número de componentes contiene la mayoría de los defectos\nd) Las pruebas exhaustivas son imposibles: probar todas las entradas no es factible",
+    opts: ["a","b","c","d"],
+    labels: ["a) Las pruebas dependen del contexto: los pesticidas paradox hacen que las mismas pruebas dejen de detectar nuevos defectos","b) La ausencia de errores es una falacia: encontrar y corregir muchos defectos asegura el éxito","c) La agrupación de defectos: un pequeño número de componentes contiene la mayoría de los defectos","d) Las pruebas exhaustivas son imposibles: probar todas las entradas no es factible"],
+    correct: ["a"],
+    obj: "FL-1.3.1", k: "K2",
+    explanation: "Este principio (paradoja del pesticida) significa que si se repiten las mismas pruebas una y otra vez, con el tiempo estas pruebas dejan de detectar nuevos defectos. Esa es probablemente la razón por la que todas las pruebas pasaron también en esta entrega."
+  },
+  {
+    id: 4, cap: 1,
+    text: "¿Cuál de las siguientes es un ejemplo de actividad de ANÁLISIS DE PRUEBA?\na) Estimar el esfuerzo de prueba\nb) Identificar qué debe probarse, como 'el sistema debe rechazar contraseñas de menos de 8 caracteres'\nc) Utilizar técnicas de prueba para obtener elementos de cobertura\nd) Informar de los defectos encontrados durante las pruebas dinámicas",
+    opts: ["a","b","c","d"],
+    labels: ["a) Estimar el esfuerzo de prueba","b) Identificar qué debe probarse, como 'el sistema debe rechazar contraseñas de menos de 8 caracteres'","c) Utilizar técnicas de prueba para obtener elementos de cobertura","d) Informar de los defectos encontrados durante las pruebas dinámicas"],
+    correct: ["b"],
+    obj: "FL-1.4.1", k: "K2",
+    explanation: "La opción b es un ejemplo de definición de condiciones de prueba que forma parte del análisis de prueba. La estimación de esfuerzo es planificación; utilizar técnicas es diseño; informar defectos es ejecución."
+  },
+  {
+    id: 5, cap: 1,
+    text: "Considera los siguientes factores: I. El CVDS. II. El número de defectos en proyectos anteriores. III. Los riesgos de producto identificados. IV. Los requisitos normativos. V. El entorno de prueba. ¿Cuáles de estos factores influyen significativamente en el proceso de prueba?\na) I, II, III y IV\nb) I, III y IV\nc) II, III, IV y V\nd) I, II y V",
+    opts: ["a","b","c","d"],
+    labels: ["a) I, II, III y IV","b) I, III y IV","c) II, III, IV y V","d) I, II y V"],
+    correct: ["b"],
+    obj: "FL-1.4.2", k: "K2",
+    explanation: "El CVDS, los riesgos de producto y los requisitos normativos tienen influencia significativa. El número de defectos anteriores tiene cierta influencia pero no es tan significativo. El entorno de prueba debe ser copia de producción pero no influye significativamente en el proceso."
+  },
+  {
+    id: 6, cap: 1,
+    text: "En un equipo ágil, ¿cuáles de las siguientes son tareas TÍPICAS DE LOS PROBADORES? (Selecciona DOS)\na) Participar en la definición de criterios de aceptación\nb) Construir y mantener la lista de trabajo acumulado del producto\nc) Implementar las funcionalidades del producto\nd) Gestionar y organizar el trabajo del equipo de desarrollo\ne) Automatizar las pruebas cuando sea necesario",
+    opts: ["a","b","c","d","e"],
+    labels: ["a) Participar en la definición de criterios de aceptación","b) Construir y mantener la lista de trabajo acumulado del producto","c) Implementar las funcionalidades del producto","d) Gestionar y organizar el trabajo del equipo de desarrollo","e) Automatizar las pruebas cuando sea necesario"],
+    correct: ["a","e"],
+    obj: "FL-1.4.5", k: "K2",
+    explanation: "Los probadores se encargan de participar en criterios de aceptación (a) y de automatizar pruebas (e). La lista de trabajo acumulado la gestiona el propietario del producto; implementar funcionalidades es del equipo de desarrollo; organizar el trabajo es del jefe de prueba."
+  },
+  {
+    id: 7, cap: 1,
+    text: "Considera estas afirmaciones sobre competencias de los probadores: I. Tener conocimientos del dominio. II. Escribir las historias de usuario con el representante de negocio. III. Ser un buen jugador de equipo. IV. Planificar y organizar el trabajo del equipo. V. Tener pensamiento crítico. ¿Cuáles son competencias IMPORTANTES de los probadores?\na) I, II y V\nb) I, III y V\nc) II, IV y V\nd) I, III y IV",
+    opts: ["a","b","c","d"],
+    labels: ["a) I, II y V","b) I, III y V","c) II, IV y V","d) I, III y IV"],
+    correct: ["b"],
+    obj: "FL-1.5.1", k: "K2",
+    explanation: "Conocimientos del dominio (I), ser buen jugador de equipo (III) y pensamiento crítico (V) son competencias importantes de los probadores. Escribir historias de usuario es tarea del analista de negocio; planificar el equipo es del jefe de prueba."
+  },
+  {
+    id: 8, cap: 1,
+    text: "¿Cuál de las siguientes afirmaciones describe MEJOR la relación entre probadores y representantes de negocio?\na) Los probadores definen el enfoque de automatización con ayuda de desarrolladores y representantes de negocio\nb) La estrategia de prueba se decide en colaboración con los desarrolladores\nc) Los probadores, desarrolladores y representantes de negocio forman el enfoque de equipo completo\nd) Los probadores colaboran estrechamente con representantes de negocio para asegurar los niveles de calidad y apoyarles en pruebas de aceptación",
+    opts: ["a","b","c","d"],
+    labels: ["a) Los probadores definen el enfoque de automatización con ayuda de desarrolladores y representantes de negocio","b) La estrategia de prueba se decide en colaboración con los desarrolladores","c) Los probadores, desarrolladores y representantes de negocio forman el enfoque de equipo completo","d) Los probadores colaboran estrechamente con representantes de negocio para asegurar los niveles de calidad y apoyarles en pruebas de aceptación"],
+    correct: ["d"],
+    obj: "FL-1.5.2", k: "K1",
+    explanation: "Los probadores colaborarán estrechamente con los representantes de negocio para asegurar que se alcanzan los niveles de calidad deseados. Esto incluye apoyarles y colaborar con ellos para ayudarles a crear pruebas de aceptación adecuadas."
+  },
+  {
+    id: 9, cap: 2,
+    text: "¿Cuál de las siguientes afirmaciones es válida para TODOS los modelos de ciclo de vida de desarrollo del software (CVDS)?\na) Las pruebas de sistema solo pueden realizarse cuando existe un entorno de producción\nb) Las pruebas dinámicas siempre preceden a las pruebas estáticas\nc) Las actividades de prueba comienzan después de completar el desarrollo\nd) Para cada actividad de desarrollo existe una actividad de prueba correspondiente",
+    opts: ["a","b","c","d"],
+    labels: ["a) Las pruebas de sistema solo pueden realizarse cuando existe un entorno de producción","b) Las pruebas dinámicas siempre preceden a las pruebas estáticas","c) Las actividades de prueba comienzan después de completar el desarrollo","d) Para cada actividad de desarrollo existe una actividad de prueba correspondiente"],
+    correct: ["d"],
+    obj: "FL-2.1.2", k: "K1",
+    explanation: "Esta regla es válida para todos los modelos de CVDS: para cada actividad de desarrollo existe una actividad de prueba correspondiente."
+  },
+  {
+    id: 10, cap: 2,
+    text: "¿Cuál de las siguientes afirmaciones describe CORRECTAMENTE el Desarrollo Guiado por Pruebas de Aceptación (DGPA)?\na) Las pruebas se escriben en formato Dado/Cuando/Entonces, usado en DGC\nb) Es la descripción del Desarrollo Guiado por Pruebas (DGP), donde las pruebas preceden al código\nc) En el DGPA las pruebas se escriben a partir de criterios de aceptación como parte del proceso de diseño\nd) Se utiliza en BDD para describir el comportamiento del sistema",
+    opts: ["a","b","c","d"],
+    labels: ["a) Las pruebas se escriben en formato Dado/Cuando/Entonces, usado en DGC","b) Es la descripción del Desarrollo Guiado por Pruebas (DGP), donde las pruebas preceden al código","c) En el DGPA las pruebas se escriben a partir de criterios de aceptación como parte del proceso de diseño","d) Se utiliza en BDD para describir el comportamiento del sistema"],
+    correct: ["c"],
+    obj: "FL-2.1.3", k: "K1",
+    explanation: "En el desarrollo guiado por pruebas de aceptación (DGPA) las pruebas se escriben a partir de criterios de aceptación como parte del proceso de diseño. El formato Dado/Cuando/Entonces es más propio de DGC/BDD."
+  },
+  {
+    id: 11, cap: 2,
+    text: "¿Cuál de las siguientes NO es un ejemplo del enfoque de desplazamiento a la izquierda (shift-left)?\na) Revisión anticipada de los requisitos\nb) Desarrollo Guiado por Pruebas (TDD)\nc) Prueba no funcional temprana\nd) Crear guiones de prueba antes de establecer el proceso de gestión de la configuración",
+    opts: ["a","b","c","d"],
+    labels: ["a) Revisión anticipada de los requisitos","b) Desarrollo Guiado por Pruebas (TDD)","c) Prueba no funcional temprana","d) Crear guiones de prueba antes de establecer el proceso de gestión de la configuración"],
+    correct: ["d"],
+    obj: "FL-2.1.5", k: "K2",
+    explanation: "Los guiones de prueba deben estar sujetos a la gestión de la configuración, por lo que no tiene sentido crearlos antes de que se establezca este proceso. Las otras tres opciones sí son ejemplos de desplazamiento a la izquierda."
+  },
+  {
+    id: 12, cap: 2,
+    text: "¿Cuál de las siguientes afirmaciones describe MEJOR el beneficio de realizar retrospectivas con regularidad en el desarrollo ágil?\na) Son útiles para comunicar a los clientes el progreso del proyecto\nb) Los representantes de negocio dan retroalimentación sobre el producto\nc) Las retrospectivas con seguimiento adecuado son fundamentales para la mejora continua del desarrollo y las pruebas\nd) Refuerzan los valores de valor y respeto de la Programación Extrema",
+    opts: ["a","b","c","d"],
+    labels: ["a) Son útiles para comunicar a los clientes el progreso del proyecto","b) Los representantes de negocio dan retroalimentación sobre el producto","c) Las retrospectivas con seguimiento adecuado son fundamentales para la mejora continua del desarrollo y las pruebas","d) Refuerzan los valores de valor y respeto de la Programación Extrema"],
+    correct: ["c"],
+    obj: "FL-2.1.6", k: "K2",
+    explanation: "Las retrospectivas realizadas con regularidad, cuando se llevan a cabo las actividades de seguimiento adecuadas, son fundamentales para la mejora continua del desarrollo y las pruebas."
+  },
+  {
+    id: 13, cap: 2,
+    text: "¿Cuál de las siguientes opciones hace corresponder CORRECTAMENTE cada nivel de prueba con su base de prueba y objeto de prueba?\na) 1-D, 2-B, 3-A, 4-C (Aceptación-necesidades negocio; Integración componentes-comunicación; Componentes-lógica; Sistema-reglas negocio)\nb) 1-C, 2-A, 3-D, 4-B\nc) 1-A, 2-C, 3-B, 4-D\nd) 1-B, 2-D, 3-C, 4-A",
+    opts: ["a","b","c","d"],
+    labels: ["a) 1-D, 2-B, 3-A, 4-C","b) 1-C, 2-A, 3-D, 4-B","c) 1-A, 2-C, 3-B, 4-D","d) 1-B, 2-D, 3-C, 4-A"],
+    correct: ["a"],
+    obj: "FL-2.2.1", k: "K2",
+    explanation: "La base de prueba para las pruebas de aceptación son las necesidades de negocio del usuario (1D). La comunicación entre componentes se prueba durante las pruebas de integración de componentes (2B). Los fallos en la lógica pueden encontrarse durante las pruebas de componentes (3A). Las reglas de negocio son la base de prueba para las pruebas de sistema (4C)."
+  },
+  {
+    id: 14, cap: 2,
+    text: "En un proyecto se realizaron 3 ejecuciones de prueba. En la ejecución 1, CP1 y CP3 fallaron; CP2 pasó. En la ejecución 2, CP1 pasó (re-prueba); CP2 y CP3 fallaron. En la ejecución 3, CP2 y CP3 pasaron. ¿Cuál opción identifica correctamente las pruebas de confirmación y regresión?\na) Confirmación: 4,6,8,9. Regresión: 5,7\nb) Confirmación: 4,6,8,9. Regresión: 5,7\nc) Confirmación: 5,7. Regresión: 4,6,8,9\nd) Confirmación: 4,5,8. Regresión: 6,7,9",
+    opts: ["a","b","c","d"],
+    labels: ["a) Opción a","b) Confirmación: 4,6,8,9 / Regresión: 5,7","c) Opción c","d) Opción d"],
+    correct: ["b"],
+    obj: "FL-2.2.3", k: "K2",
+    explanation: "CP1 y CP3 fallaron en ejecución 1, por lo que la prueba(4) y prueba(6) son confirmación. CP2 y CP3 fallaron en ejecución 2, por lo que prueba(8) y prueba(9) son confirmación. CP2 pasó en ejecución 1 → prueba(5) es regresión. CP1 pasó en ejecución 2 → prueba(7) es regresión."
+  },
+  {
+    id: 15, cap: 3,
+    text: "¿Cuál de las siguientes NO es una ventaja de la prueba estática?\na) La gestión de defectos es más costosa en la prueba estática que en la prueba dinámica\nb) Detectar defectos que son difíciles de encontrar mediante pruebas dinámicas\nc) Identificar inconsistencias, ambigüedades u omisiones en los requisitos\nd) Proporcionar retroalimentación sobre la calidad de los productos del trabajo",
+    opts: ["a","b","c","d"],
+    labels: ["a) La gestión de defectos es más costosa en la prueba estática que en la prueba dinámica","b) Detectar defectos que son difíciles de encontrar mediante pruebas dinámicas","c) Identificar inconsistencias, ambigüedades u omisiones en los requisitos","d) Proporcionar retroalimentación sobre la calidad de los productos del trabajo"],
+    correct: ["a"],
+    obj: "FL-3.1.2", k: "K2",
+    explanation: "La gestión de defectos NO es menos costosa en la prueba estática; al contrario, encontrar y corregir defectos más tarde en el CVDS es más costoso. Las opciones b, c y d sí son ventajas reales de la prueba estática."
+  },
+  {
+    id: 16, cap: 3,
+    text: "¿Cuál de las siguientes afirmaciones describe MEJOR el beneficio de la retroalimentación temprana y frecuente en el proceso de prueba?\na) Permite mejorar el proceso de prueba para futuros proyectos\nb) Se utiliza para priorizar los requisitos del sistema\nc) Permite medir la calidad de los cambios realizados en el código\nd) Permite la comunicación precoz de posibles problemas de calidad",
+    opts: ["a","b","c","d"],
+    labels: ["a) Permite mejorar el proceso de prueba para futuros proyectos","b) Se utiliza para priorizar los requisitos del sistema","c) Permite medir la calidad de los cambios realizados en el código","d) Permite la comunicación precoz de posibles problemas de calidad"],
+    correct: ["d"],
+    obj: "FL-3.2.1", k: "K1",
+    explanation: "La retroalimentación temprana y frecuente permite la comunicación precoz de posibles problemas de calidad. No se usa para priorizar requisitos ni para medir cambios específicamente."
+  },
+  {
+    id: 17, cap: 3,
+    text: "Un equipo de revisión tiene: rol de escriba, propósito de evaluar la calidad, la reunión está dirigida por el autor del producto de trabajo, revisores individuales encuentran anomalías en preparación, y se elabora informe de revisión. ¿Qué tipo de revisión describe esto?\na) Revisión informal\nb) Revisión guiada\nc) Revisión técnica\nd) Inspección",
+    opts: ["a","b","c","d"],
+    labels: ["a) Revisión informal","b) Revisión guiada","c) Revisión técnica","d) Inspección"],
+    correct: ["b"],
+    obj: "FL-3.2.4", k: "K2",
+    explanation: "Existe un rol de escriba (no puede ser informal), el propósito es evaluar la calidad (objetivo de revisión guiada), la reunión está dirigida por el autor (no permitido en inspecciones, inusual en técnicas), y se necesita moderador (revisión guiada). Por lo tanto es una revisión guiada."
+  },
+  {
+    id: 18, cap: 3,
+    text: "¿Cuál de las siguientes afirmaciones sobre los factores de éxito de las revisiones es INCORRECTA?\na) Dar tiempo adecuado a los individuos para preparar la revisión es un factor de éxito\nb) Dividir los productos del trabajo en pequeñas partes adecuadas es un factor de éxito\nc) Evitar comportamientos que puedan indicar aburrimiento o exasperación es un factor de éxito\nd) Durante las revisiones se pueden encontrar fallos en el software",
+    opts: ["a","b","c","d"],
+    labels: ["a) Dar tiempo adecuado a los individuos para preparar la revisión es un factor de éxito","b) Dividir los productos del trabajo en pequeñas partes adecuadas es un factor de éxito","c) Evitar comportamientos que puedan indicar aburrimiento o exasperación es un factor de éxito","d) Durante las revisiones se pueden encontrar fallos en el software"],
+    correct: ["d"],
+    obj: "FL-3.2.5", k: "K1",
+    explanation: "La opción d es incorrecta: durante las revisiones se pueden encontrar DEFECTOS, no fallos. Los fallos solo pueden ocurrir durante la ejecución dinámica del software."
+  },
+  {
+    id: 19, cap: 4,
+    text: "¿Cuál de las siguientes afirmaciones describe MEJOR una característica común de las técnicas de prueba basadas en la EXPERIENCIA?\na) Las condiciones de prueba se obtienen a partir del código o la arquitectura de software\nb) La cobertura se mide en función de los elementos probados dentro de una estructura seleccionada\nc) El conocimiento del uso previsto del software, su entorno y los defectos probables se usa para definir las pruebas\nd) Los casos de prueba pueden utilizarse para detectar lagunas en los requisitos",
+    opts: ["a","b","c","d"],
+    labels: ["a) Las condiciones de prueba se obtienen a partir del código o la arquitectura de software","b) La cobertura se mide en función de los elementos probados dentro de una estructura seleccionada","c) El conocimiento del uso previsto del software, su entorno y los defectos probables se usa para definir las pruebas","d) Los casos de prueba pueden utilizarse para detectar lagunas en los requisitos"],
+    correct: ["c"],
+    obj: "FL-4.1.1", k: "K2",
+    explanation: "Las técnicas basadas en experiencia utilizan el conocimiento previsto del software, su entorno, los defectos probables y su distribución. Las opciones a y b describen caja blanca; la d describe caja negra."
+  },
+  {
+    id: 20, cap: 4,
+    text: "Un sistema de alquiler de apartamentos clasifica por tipo de planta: planta baja, primera planta, segunda planta o superior. Y por tipo de jardín: jardín pequeño, jardín grande, sin jardín (solo aplicable a planta baja). ¿Cuántos casos de prueba se necesitan COMO MÍNIMO para cubrir todas las particiones de equivalencia válidas?\na) 3\nb) 4\nc) 5\nd) 6",
+    opts: ["a","b","c","d"],
+    labels: ["a) 3","b) 4","c) 5","d) 6"],
+    correct: ["b"],
+    obj: "FL-4.2.1", k: "K3",
+    explanation: "Jardín pequeño y jardín grande solo pueden ir con planta baja → 2 CP. Se necesitan 2 CP más para cubrir las otras particiones de planta baja y sin jardín. Total: CP1(planta baja, jardín pequeño), CP2(planta baja, jardín grande), CP3(primera planta, sin jardín), CP4(segunda planta o superior, sin jardín) = 4 casos."
+  },
+  {
+    id: 21, cap: 4,
+    text: "Se usa análisis de valor frontera de 2 puntos. Los resultados finales se clasifican en: <50 (suspenso), 50-60 (suficiente), 61-70 (bien), 71-80 (notable), 81-90 (sobresaliente), >90 (matrícula). Los casos de prueba existentes cubren: CP1=91, CP2=50, CP3=81, CP4=60, CP5=70, CP7=51. ¿Qué porcentaje de cobertura de frontera se logra?\na) 50%\nb) 33%\nc) 66%\nd) 75%",
+    opts: ["a","b","c","d"],
+    labels: ["a) 50%","b) 33%","c) 66%","d) 75%"],
+    correct: ["a"],
+    obj: "FL-4.2.2", k: "K3",
+    explanation: "Hay 12 valores frontera: 0,50,51,60,61,70,71,80,81,90,91,100. Los CP cubren 6 de ellos (91, 50, 81, 60, 70, 51). Por tanto 6/12 = 50%."
+  },
+  {
+    id: 22, cap: 4,
+    text: "Una tabla de decisión para un servicio de alquiler de bicicletas: socios obtienen descuento después del 5º alquiler; socios sin plazo incumplido obtienen camiseta después del 15º; no socios no obtienen descuento. ¿Cuál resultado es INCORRECTO según las reglas?\na) Socio sin plazo incumplido, 16 alquileres → descuento y camiseta\nb) Socio sin plazo incumplido, 8 alquileres → descuento pero no camiseta\nc) No socio, sin plazo incumplido → no descuento\nd) No socio con plazo incumplido → camiseta de regalo",
+    opts: ["a","b","c","d"],
+    labels: ["a) Socio sin plazo incumplido, 16 alquileres → descuento y camiseta","b) Socio sin plazo incumplido, 8 alquileres → descuento pero no camiseta","c) No socio, sin plazo incumplido → no descuento","d) No socio con plazo incumplido → camiseta de regalo"],
+    correct: ["d"],
+    obj: "FL-4.2.3", k: "K3",
+    explanation: "No hay descuento como no socio (correcto), pero solo los socios pueden recibir una camiseta de regalo. Un no socio no puede recibir camiseta aunque no haya incumplido plazos. La acción de la opción d es incorrecta."
+  },
+  {
+    id: 23, cap: 4,
+    text: "Un diagrama de transición de estados para una tarea tiene: PROBAR, EJECUTAR, PAUSAR, REANUDAR, ERROR, COMPLETADO. Las transiciones PROBAR y ERROR no pueden ir en el mismo caso de prueba; tampoco las dos transiciones 'hecho'. ¿Cuántos casos de prueba se necesitan COMO MÍNIMO para la cobertura de todas las transiciones?\na) 1\nb) 2\nc) 3 — incorrecto\nd) 3",
+    opts: ["a","b","c","d"],
+    labels: ["a) 1","b) 2","c) Solo con 2 se puede lograr cobertura completa","d) Se necesitan al menos 3 casos de prueba"],
+    correct: ["d"],
+    obj: "FL-4.2.4", k: "K3",
+    explanation: "PROBAR y ERROR no pueden darse en un mismo CP. Tampoco las dos transiciones 'hecho'. Se necesitan al menos 3: CP1(PROBAR, COMPLETADO), CP2(EJECUTAR, ERROR, COMPLETADO), CP3(EJECUTAR, PAUSAR, REANUDAR, PAUSAR, COMPLETADO)."
+  },
+  {
+    id: 24, cap: 4,
+    text: "¿Cuál de las siguientes afirmaciones sobre la COBERTURA DE SENTENCIA es CORRECTA?\na) Al lograr 100% de cobertura de sentencia, todas las sentencias con defectos también se habrán ejecutado al menos una vez\nb) La cobertura de sentencia depende del número de casos de prueba ejecutados\nc) La cobertura de sentencia del 100% implica ejecutar todos los caminos posibles del código\nd) La cobertura de sentencia del 100% implica realizar pruebas exhaustivas",
+    opts: ["a","b","c","d"],
+    labels: ["a) Al lograr 100% de cobertura de sentencia, todas las sentencias con defectos también se habrán ejecutado al menos una vez","b) La cobertura de sentencia depende del número de casos de prueba ejecutados","c) La cobertura de sentencia del 100% implica ejecutar todos los caminos posibles del código","d) La cobertura de sentencia del 100% implica realizar pruebas exhaustivas"],
+    correct: ["a"],
+    obj: "FL-4.3.1", k: "K2",
+    explanation: "Al conseguir 100% de cobertura de sentencia, todas las sentencias, incluidas las que tienen defectos, deben haberse ejecutado y evaluado al menos una vez. La cobertura no depende del número de CP sino de qué se prueba."
+  },
+  {
+    id: 25, cap: 4,
+    text: "¿Cuál de las siguientes afirmaciones describe MEJOR la DEBILIDAD PRINCIPAL de las técnicas de prueba de caja blanca?\na) No tienen en cuenta toda la implementación de software durante las pruebas\nb) No proporcionan una medida objetiva de cobertura\nc) No pueden utilizarse para realizar revisiones (pruebas estáticas)\nd) No son capaces de identificar la implementación que falta, porque se basan en la estructura, no en los requisitos",
+    opts: ["a","b","c","d"],
+    labels: ["a) No tienen en cuenta toda la implementación de software durante las pruebas","b) No proporcionan una medida objetiva de cobertura","c) No pueden utilizarse para realizar revisiones (pruebas estáticas)","d) No son capaces de identificar la implementación que falta, porque se basan en la estructura, no en los requisitos"],
+    correct: ["d"],
+    obj: "FL-4.3.3", k: "K2",
+    explanation: "El punto débil principal de la caja blanca es que no son capaces de identificar la implementación que falta, porque se basan únicamente en la estructura del objeto de prueba, no en la especificación de requisitos."
+  },
+  {
+    id: 26, cap: 4,
+    text: "¿Cuál de las siguientes afirmaciones describe MEJOR el concepto de PREDICCIÓN DE ERRORES?\na) El probador intenta conjeturar qué errores puede haber cometido el desarrollador basándose en la experiencia pasada\nb) El probador usa su experiencia previa como desarrollador para predecir errores\nc) Es una técnica de usabilidad para adivinar cómo pueden fallar los usuarios al interactuar con el sistema\nd) El probador duplica la tarea de desarrollo para detectar errores independientemente",
+    opts: ["a","b","c","d"],
+    labels: ["a) El probador intenta conjeturar qué errores puede haber cometido el desarrollador basándose en la experiencia pasada","b) El probador usa su experiencia previa como desarrollador para predecir errores","c) Es una técnica de usabilidad para adivinar cómo pueden fallar los usuarios al interactuar con el sistema","d) El probador duplica la tarea de desarrollo para detectar errores independientemente"],
+    correct: ["a"],
+    obj: "FL-4.4.1", k: "K2",
+    explanation: "El concepto básico de la predicción de errores es que el probador intenta conjeturar qué errores puede haber cometido el desarrollador y qué defectos puede haber en el objeto de prueba basándose en la experiencia pasada (y a veces en listas de comprobación)."
+  },
+  {
+    id: 27, cap: 4,
+    text: "Un probador debe probar un producto nuevo sin documentación formal y con un plazo muy ajustado. ¿Qué técnica es la MÁS ADECUADA?\na) Prueba basada en lista de comprobación\nb) Predicción de errores\nc) Pruebas exploratorias\nd) Prueba de rama",
+    opts: ["a","b","c","d"],
+    labels: ["a) Prueba basada en lista de comprobación","b) Predicción de errores","c) Pruebas exploratorias","d) Prueba de rama"],
+    correct: ["c"],
+    obj: "FL-4.4.2", k: "K2",
+    explanation: "Las pruebas exploratorias son más útiles cuando hay pocas especificaciones conocidas y/o hay un plazo apremiante. No hay lista de comprobación para un producto nuevo, ni información suficiente para predicción de errores. La prueba de rama lleva mucho tiempo."
+  },
+  {
+    id: 28, cap: 4,
+    text: "¿Cuál de las siguientes es la forma ESTÁNDAR de documentar los criterios de aceptación en el desarrollo ágil?\na) En las retrospectivas del sprint\nb) Como parte de la historia de usuario en la que se basan\nc) Mediante comunicación verbal entre desarrolladores y probadores\nd) En el plan de prueba junto con los riesgos del proyecto",
+    opts: ["a","b","c","d"],
+    labels: ["a) En las retrospectivas del sprint","b) Como parte de la historia de usuario en la que se basan","c) Mediante comunicación verbal entre desarrolladores y probadores","d) En el plan de prueba junto con los riesgos del proyecto"],
+    correct: ["b"],
+    obj: "FL-4.5.2", k: "K2",
+    explanation: "Es la forma estándar de documentar los criterios de aceptación: como parte de la historia de usuario (aspecto 'tarjeta' en el modelo de las 3C). La comunicación verbal no permite documentar físicamente; las retrospectivas son para mejora continua."
+  },
+  {
+    id: 29, cap: 4,
+    text: "Una historia de usuario dice: 'Como editor, quiero poder editar documentos para poder actualizar el contenido. Criterios de aceptación: (1) el editor puede modificar cualquier campo del documento; (2) los cambios se guardan al hacer clic en Guardar'. ¿Qué caso de prueba cubre DOS criterios de aceptación?\na) Editar un campo del documento y verificar que los cambios se guardan correctamente\nb) Verificar que el propietario del contenido puede editar el documento\nc) Programar el contenido editado para publicación futura\nd) Reasignar el documento a otro editor",
+    opts: ["a","b","c","d"],
+    labels: ["a) Editar un campo del documento y verificar que los cambios se guardan correctamente","b) Verificar que el propietario del contenido puede editar el documento","c) Programar el contenido editado para publicación futura","d) Reasignar el documento a otro editor"],
+    correct: ["a"],
+    obj: "FL-4.5.3", k: "K3",
+    explanation: "Esta prueba abarca dos criterios de aceptación: uno sobre la edición del documento (criterio 1) y otro sobre el guardado de los cambios (criterio 2). Las demás opciones cubren actividades no relacionadas con los criterios dados."
+  },
+  {
+    id: 30, cap: 5,
+    text: "¿Cuál de las siguientes es una forma en que los probadores AÑADEN VALOR a la planificación de la iteración y la entrega en el desarrollo ágil?\na) Los probadores determinan las prioridades de las historias de usuario con el representante de negocio\nb) Los probadores se concentran en los aspectos funcionales y no funcionales del sistema\nc) Los probadores identifican y comunican los riesgos de prueba relevantes para la planificación de la iteración\nd) El diseño de prueba temprana garantiza automáticamente la entrega de software de calidad",
+    opts: ["a","b","c","d"],
+    labels: ["a) Los probadores determinan las prioridades de las historias de usuario con el representante de negocio","b) Los probadores se concentran en los aspectos funcionales y no funcionales del sistema","c) Los probadores identifican y comunican los riesgos de prueba relevantes para la planificación de la iteración","d) El diseño de prueba temprana garantiza automáticamente la entrega de software de calidad"],
+    correct: ["c"],
+    obj: "FL-5.1.2", k: "K1",
+    explanation: "Según el programa de estudio, una de las formas en que los probadores añaden valor a la planificación es identificando y comunicando los riesgos de prueba relevantes. Las prioridades de historias las determina el representante de negocio."
+  },
+  {
+    id: 31, cap: 5,
+    text: "¿Cuáles de los siguientes son ejemplos de CRITERIOS DE SALIDA? (Selecciona DOS)\na) Disponibilidad del entorno de prueba\nb) Disponibilidad de los casos de prueba\nc) Densidad de defectos estimada alcanzada\nd) Requisitos traducidos a un formato determinado\ne) Automatización de las pruebas de regresión completada",
+    opts: ["a","b","c","d","e"],
+    labels: ["a) Disponibilidad del entorno de prueba","b) Disponibilidad de los casos de prueba","c) Densidad de defectos estimada alcanzada","d) Requisitos traducidos a un formato determinado","e) Automatización de las pruebas de regresión completada"],
+    correct: ["c","e"],
+    obj: "FL-5.1.3", k: "K2",
+    explanation: "La densidad de defectos estimada (c) es una medida de diligencia → criterio de salida. La automatización de regresión completada (e) es un criterio de compleción → criterio de salida. La disponibilidad de entorno y casos son criterios de entrada; los requisitos traducidos también son criterios de entrada."
+  },
+  {
+    id: 32, cap: 5,
+    text: "Un jefe de prueba usa la técnica de estimación de tres puntos. Para una tarea: estimación optimista = 2 días, más probable = 11 días, pesimista = 14 días. Usando la fórmula E = (O + 4M + P) / 6, ¿cuántos días es la estimación?\na) 9\nb) 11\nc) 8\nd) 10",
+    opts: ["a","b","c","d"],
+    labels: ["a) 9 días","b) 11 días","c) 8 días","d) 10 días"],
+    correct: ["d"],
+    obj: "FL-5.1.4", k: "K3",
+    explanation: "E = (2 + 4×11 + 14) / 6 = (2 + 44 + 14) / 6 = 60 / 6 = 10 días."
+  },
+  {
+    id: 33, cap: 5,
+    text: "Hay 5 casos de prueba con dependencias y prioridades: TC001(prioridad media, sin dependencias), TC002(prioridad media, depende de TC001), TC003(prioridad alta, depende de TC002), TC004(prioridad baja, depende de TC003), TC005(prioridad baja, depende de TC004). ¿Cuál es el orden correcto considerando dependencias Y prioridades?\na) TC001, TC002, TC003, TC004, TC005\nb) TC003, TC001, TC002, TC004, TC005\nc) TC003, TC002, TC001, TC004, TC005\nd) TC001, TC003, TC002, TC004, TC005",
+    opts: ["a","b","c","d"],
+    labels: ["a) TC001, TC002, TC003, TC004, TC005","b) TC003, TC001, TC002, TC004, TC005","c) TC003, TC002, TC001, TC004, TC005","d) TC001, TC003, TC002, TC004, TC005"],
+    correct: ["a"],
+    obj: "FL-5.1.5", k: "K3",
+    explanation: "TC001 debe ser primero (sin dependencias, y TC002 depende de él). TC002 va después (depende de TC001). TC003 después (alta prioridad pero depende de TC002). TC004 y TC005 al final por sus dependencias."
+  },
+  {
+    id: 34, cap: 5,
+    text: "¿Cuál de las siguientes opciones hace corresponder CORRECTAMENTE cada tipo de prueba con su cuadrante de la pirámide de prueba?\na) 1-C(usabilidad-Q3), 2-A(componentes-Q1), 3-B(funcional-Q2), 4-D(fiabilidad-Q4)\nb) 1-A, 2-C, 3-D, 4-B\nc) 1-B, 2-D, 3-A, 4-C\nd) 1-D, 2-B, 3-C, 4-A",
+    opts: ["a","b","c","d"],
+    labels: ["a) Usabilidad→Q3, Componentes→Q1, Funcional→Q2, Fiabilidad→Q4","b) Variante B","c) Variante C","d) Variante D"],
+    correct: ["a"],
+    obj: "FL-5.1.7", k: "K2",
+    explanation: "La prueba de usabilidad tiene lugar en la Q3 (1-C). La prueba de componentes tiene lugar en la Q1 (2-A). La prueba funcional tiene lugar en la Q2 (3-B). La prueba de fiabilidad tiene lugar en la Q4 (4-D)."
+  },
+  {
+    id: 35, cap: 5,
+    text: "Un equipo identifica el riesgo: 'los usuarios no comprenden cómo usar la nueva interfaz'. Proponen como respuesta: 'realizar pruebas de usabilidad con usuarios reales antes del lanzamiento'. ¿Qué tipo de respuesta al riesgo es esta?\na) Aceptación del riesgo\nb) Plan de contingencia\nc) Mitigación del riesgo mediante pruebas\nd) Transferencia del riesgo",
+    opts: ["a","b","c","d"],
+    labels: ["a) Aceptación del riesgo","b) Plan de contingencia","c) Mitigación del riesgo mediante pruebas","d) Transferencia del riesgo"],
+    correct: ["c"],
+    obj: "FL-5.2.4", k: "K2",
+    explanation: "Las acciones propuestas están relacionadas con la prueba, que es una forma de mitigación del riesgo. No se acepta el riesgo (no se proponen acciones concretas de aceptación), ni hay plan de contingencia, ni se transfiere."
+  },
+  {
+    id: 36, cap: 5,
+    text: "Un jefe de prueba necesita mostrar de forma CONTINUA dentro de una iteración el avance del trabajo. ¿Qué artefacto es el MÁS ADECUADO?\na) Los criterios de aceptación de las historias de usuario\nb) Los informes de defectos\nc) El informe de compleción de la prueba\nd) Los gráficos de quemado (burndown charts)",
+    opts: ["a","b","c","d"],
+    labels: ["a) Los criterios de aceptación de las historias de usuario","b) Los informes de defectos","c) El informe de compleción de la prueba","d) Los gráficos de quemado (burndown charts)"],
+    correct: ["d"],
+    obj: "FL-5.3.3", k: "K2",
+    explanation: "Los gráficos de quemado son una representación gráfica del trabajo que queda por hacer frente al tiempo restante. Se actualizan diariamente, por lo que pueden mostrar de forma continua el avance del trabajo dentro de una iteración."
+  },
+  {
+    id: 37, cap: 5,
+    text: "¿Cuál de las siguientes afirmaciones describe MEJOR cómo la gestión de la configuración apoya la prueba?\na) La trazabilidad gestiona la relación entre diferentes versiones del mismo producto de trabajo\nb) La prueba de mantenimiento está estrechamente relacionada con el control de versiones\nc) La gestión de la configuración puede implicar el control de versión de todos los elementos de prueba\nd) La ingeniería de requisitos está relacionada con el versionado de guiones de prueba",
+    opts: ["a","b","c","d"],
+    labels: ["a) La trazabilidad gestiona la relación entre diferentes versiones del mismo producto de trabajo","b) La prueba de mantenimiento está estrechamente relacionada con el control de versiones","c) La gestión de la configuración puede implicar el control de versión de todos los elementos de prueba","d) La ingeniería de requisitos está relacionada con el versionado de guiones de prueba"],
+    correct: ["c"],
+    obj: "FL-5.4.1", k: "K2",
+    explanation: "Para apoyar la prueba, la gestión de la configuración puede implicar el control de versión de todos los elementos de prueba. La trazabilidad es la relación entre productos de trabajo diferentes, no entre versiones del mismo."
+  },
+  {
+    id: 38, cap: 5,
+    text: "Se recibe un informe de defecto sobre un error al crear usuarios con caracteres especiales. ¿Cuál de las siguientes afirmaciones sobre el informe es CORRECTA?\na) El resultado esperado y real están intercambiados\nb) No hay referencia al caso de prueba ni al requisito relacionado\nc) No se indica el entorno de prueba ni qué aplicación/versión está afectada\nd) No se indica el impacto para los implicados de negocio",
+    opts: ["a","b","c","d"],
+    labels: ["a) El resultado esperado y real están intercambiados","b) No hay referencia al caso de prueba ni al requisito relacionado","c) No se indica el entorno de prueba ni qué aplicación/versión está afectada","d) No se indica el impacto para los implicados de negocio"],
+    correct: ["c"],
+    obj: "FL-5.5.1", k: "K3",
+    explanation: "No sabemos en qué entorno de prueba se detectó la anomalía, y tampoco sabemos qué aplicación (y su versión) está afectada. Hay referencia al caso de prueba (b es falso); el impacto sí está indicado (d es falso)."
+  },
+  {
+    id: 39, cap: 6,
+    text: "¿En qué actividad del proceso de prueba se PREPARAN los datos de prueba?\na) Monitorización y control de la prueba\nb) Análisis y diseño de la prueba\nc) Implementación de la prueba\nd) Compleción de la prueba",
+    opts: ["a","b","c","d"],
+    labels: ["a) Monitorización y control de la prueba","b) Análisis y diseño de la prueba","c) Implementación de la prueba","d) Compleción de la prueba"],
+    correct: ["c"],
+    obj: "FL-6.1.1", k: "K2",
+    explanation: "La implementación de prueba incluye la creación o adquisición del software de prueba necesario para la ejecución de prueba (por ejemplo, datos de prueba). En análisis/diseño no se preparan datos; en compleción es demasiado tarde."
+  },
+  {
+    id: 40, cap: 6,
+    text: "¿Cuál de las siguientes es un RIESGO de la automatización de pruebas?\na) La automatización introduce regresiones desconocidas en producción\nb) La asignación incorrecta del esfuerzo para mantener el producto de prueba\nc) Las herramientas de prueba no son confiables por definición\nd) La automatización incrementa el número de pruebas manuales necesarias",
+    opts: ["a","b","c","d"],
+    labels: ["a) La automatización introduce regresiones desconocidas en producción","b) La asignación incorrecta del esfuerzo para mantener el producto de prueba","c) Las herramientas de prueba no son confiables por definición","d) La automatización incrementa el número de pruebas manuales necesarias"],
+    correct: ["b"],
+    obj: "FL-6.2.1", k: "K1",
+    explanation: "La asignación incorrecta del esfuerzo para mantener el producto de prueba es un riesgo real de la automatización. La automatización no introduce regresiones; las herramientas deben seleccionarse para ser confiables; el objetivo es reducir pruebas manuales (beneficio, no riesgo)."
+  },
+
+  // ──────────────── PREGUNTAS ADICIONALES A1-A26 ────────────────
+  {
+    id: "A1", cap: 1,
+    text: "¿Cuál de las siguientes afirmaciones describe MEJOR la DEPURACIÓN?\na) Es el proceso de encontrar, analizar y eliminar las causas de los fallos en un componente o sistema\nb) Es el proceso relacionado con la planificación, preparación y evaluación de un componente o sistema\nc) Es el proceso de recopilación, captura y consolidación de requisitos\nd) Es el proceso de reconocimiento, registro, clasificación e investigación de defectos",
+    opts: ["a","b","c","d"],
+    labels: ["a) Es el proceso de encontrar, analizar y eliminar las causas de los fallos en un componente o sistema","b) Es el proceso relacionado con la planificación, preparación y evaluación de un componente o sistema","c) Es el proceso de recopilación, captura y consolidación de requisitos","d) Es el proceso de reconocimiento, registro, clasificación e investigación de defectos"],
+    correct: ["a"],
+    obj: "FL-1.1.2", k: "K2",
+    explanation: "La depuración es el proceso de encontrar, analizar y eliminar las causas de los fallos. La opción b describe la prueba; c describe la educción de requisitos; d describe la gestión de defectos."
+  },
+  {
+    id: "A2", cap: 1,
+    text: "¿Cuál de las siguientes afirmaciones describe MEJOR la relación entre prueba y aseguramiento de la calidad (QA)?\na) Son lo mismo: ambas verifican que el software cumple los requisitos\nb) La prueba es un subconjunto del aseguramiento de la calidad\nc) El aseguramiento de la calidad es un subconjunto de la prueba\nd) Son diferentes: la prueba detecta defectos; el QA se concentra en establecer, monitorizar y mejorar procesos relacionados con la calidad",
+    opts: ["a","b","c","d"],
+    labels: ["a) Son lo mismo: ambas verifican que el software cumple los requisitos","b) La prueba es un subconjunto del aseguramiento de la calidad","c) El aseguramiento de la calidad es un subconjunto de la prueba","d) Son diferentes: la prueba detecta defectos; el QA se concentra en establecer, monitorizar y mejorar procesos relacionados con la calidad"],
+    correct: ["d"],
+    obj: "FL-1.2.2", k: "K1",
+    explanation: "La prueba y el aseguramiento de la calidad no son lo mismo. La prueba se concentra en detectar defectos; el aseguramiento de la calidad se concentra en establecer, introducir, monitorizar, mejorar y adherirse a los procesos relacionados con la calidad."
+  },
+  {
+    id: "A3", cap: 1,
+    text: "Un programador distraído introduce código que acepta entradas no válidas, lo que causa que el sistema se bloquee. ¿Cuál de las siguientes afirmaciones identifica CORRECTAMENTE cada concepto?\na) Causa raíz: distracción; Fallo: aceptar entradas no válidas; Error: equivocación; Defecto: problema en el código\nb) Causa raíz: distracción; Defecto: aceptar entradas no válidas; Error: equivocación; Fallo: bloqueo\nc) Error: distracción; Causa raíz: código erróneo; Fallo: bloqueo; Defecto: entradas no válidas\nd) Causa raíz: distracción; Error: equivocación del programador; Defecto: problema en el código; Fallo: bloqueo del sistema",
+    opts: ["a","b","c","d"],
+    labels: ["a) Opción A","b) Causa raíz: distracción; Defecto: aceptar entradas no válidas; Error: equivocación; Fallo: bloqueo","c) Opción C","d) Causa raíz: distracción; Error: equivocación; Defecto: problema en el código; Fallo: bloqueo del sistema"],
+    correct: ["d"],
+    obj: "FL-1.2.3", k: "K2",
+    explanation: "Causa raíz: distracción del programador. Error: la equivocación que dio como resultado la introducción del defecto en el código. Defecto: el problema en el código. Fallo: el bloqueo del sistema (aceptar entradas no válidas es el fallo observable)."
+  },
+  {
+    id: "A4", cap: 1,
+    text: "Un probador está probando el software de prueba. ¿Qué tipo de producto del trabajo está probando y en qué fase del proceso de prueba se creó?\na) Caso de prueba, creado en el análisis de prueba\nb) Plan de prueba, creado en la planificación de prueba\nc) Guion de prueba, creado en la implementación de prueba\nd) Contrato de prueba, creado en el diseño de prueba",
+    opts: ["a","b","c","d"],
+    labels: ["a) Caso de prueba, creado en el análisis de prueba","b) Plan de prueba, creado en la planificación de prueba","c) Guion de prueba, creado en la implementación de prueba","d) Contrato de prueba, creado en el diseño de prueba"],
+    correct: ["d"],
+    obj: "FL-1.4.3", k: "K2",
+    explanation: "El software de prueba que se está probando es un contrato de prueba. Los contratos de prueba son la salida del diseño de prueba."
+  },
+  {
+    id: "A5", cap: 1,
+    text: "¿Para qué se utiliza PRINCIPALMENTE la trazabilidad entre la base de prueba, objetos de prueba y casos de prueba?\na) Para dar información sobre la completitud de las pruebas realizando análisis de impacto\nb) Para dar información sobre el nivel estimado de riesgo residual\nc) Para ayudar a seleccionar los casos de prueba para la prueba de regresión mediante análisis de impacto\nd) Para ayudar a seleccionar los datos de prueba para lograr la cobertura del objeto de prueba",
+    opts: ["a","b","c","d"],
+    labels: ["a) Para dar información sobre la completitud de las pruebas realizando análisis de impacto","b) Para dar información sobre el nivel estimado de riesgo residual","c) Para ayudar a seleccionar los casos de prueba para la prueba de regresión mediante análisis de impacto","d) Para ayudar a seleccionar los datos de prueba para lograr la cobertura del objeto de prueba"],
+    correct: ["c"],
+    obj: "FL-1.4.4", k: "K2",
+    explanation: "Realizar el análisis de impacto de los cambios ayuda a seleccionar los casos de prueba para la prueba de regresión. El análisis de impacto no da información sobre la completitud de las pruebas en sí mismo."
+  },
+  {
+    id: "A6", cap: 1,
+    text: "¿Cuál de las siguientes es la VENTAJA PRINCIPAL de tener un equipo de prueba independiente (externo)?\na) La calidad es responsabilidad exclusiva del equipo de prueba independiente\nb) El equipo externo no tiene que cumplir plazos de entrega estrictos\nc) El equipo externo trabaja en aislamiento para mantener su independencia\nd) Un probador independiente puede cuestionar y verificar las suposiciones del desarrollador, ya que las especificaciones nunca son perfectas",
+    opts: ["a","b","c","d"],
+    labels: ["a) La calidad es responsabilidad exclusiva del equipo de prueba independiente","b) El equipo externo no tiene que cumplir plazos de entrega estrictos","c) El equipo externo trabaja en aislamiento para mantener su independencia","d) Un probador independiente puede cuestionar y verificar las suposiciones del desarrollador, ya que las especificaciones nunca son perfectas"],
+    correct: ["d"],
+    obj: "FL-1.5.3", k: "K2",
+    explanation: "Las especificaciones nunca son perfectas, lo que significa que el desarrollador tendrá que hacer suposiciones. Un probador independiente es útil en la medida en que puede cuestionar y verificar las suposiciones y la posterior interpretación realizadas por el desarrollador."
+  },
+  {
+    id: "A7", cap: 2,
+    text: "¿Cuál de las siguientes es una limitación de la prueba dinámica en los modelos de desarrollo SECUENCIAL?\na) Las pruebas dinámicas no pueden realizarse al principio del CVDS porque el código ejecutable se crea en fases posteriores\nb) Las pruebas estáticas no pueden realizarse al principio del CVDS en modelos secuenciales\nc) La planificación de prueba no puede realizarse al principio del CVDS\nd) Las pruebas de aceptación pueden realizarse cuando existe un producto en funcionamiento",
+    opts: ["a","b","c","d"],
+    labels: ["a) Las pruebas dinámicas no pueden realizarse al principio del CVDS porque el código ejecutable se crea en fases posteriores","b) Las pruebas estáticas no pueden realizarse al principio del CVDS en modelos secuenciales","c) La planificación de prueba no puede realizarse al principio del CVDS","d) Las pruebas de aceptación pueden realizarse cuando existe un producto en funcionamiento"],
+    correct: ["a"],
+    obj: "FL-2.1.1", k: "K2",
+    explanation: "En los modelos de desarrollo secuencial, los probadores participan en las fases iniciales en revisión de requisitos, análisis y diseño de prueba. El código ejecutable suele crearse en las fases posteriores, por lo que las pruebas dinámicas no pueden realizarse al principio del CVDS."
+  },
+  {
+    id: "A8", cap: 2,
+    text: "Considera las siguientes afirmaciones sobre DevOps: I. Entrega más rápida de los productos. II. Se necesita menos esfuerzo para pruebas manuales. III. Disponibilidad constante de software ejecutable. IV. Se necesitan más pruebas de regresión. V. Todo se puede automatizar. ¿Cuáles son VENTAJAS reales de DevOps?\na) I y II\nb) I, III y IV\nc) I y III\nd) II, III y V",
+    opts: ["a","b","c","d"],
+    labels: ["a) I y II","b) I, III y IV","c) I y III","d) II, III y V"],
+    correct: ["c"],
+    obj: "FL-2.1.4", k: "K2",
+    explanation: "Ventajas reales de DevOps: I (entrega más rápida) y III (disponibilidad constante de software ejecutable). II es falso porque normalmente se necesita menos esfuerzo manual gracias a la automatización, no se trata de una ventaja nueva. IV (más pruebas de regresión) es una consecuencia, no ventaja. V es falso."
+  },
+  {
+    id: "A9", cap: 2,
+    text: "Un sistema de comercio electrónico tiene el requisito: 'el sistema debe procesar 1000 pedidos por minuto'. Una prueba verifica que el sistema procese 1000 pedidos por minuto. ¿Qué tipo de prueba es esta?\na) Prueba funcional, porque proviene directamente del cliente y es de alta prioridad\nb) Prueba de rendimiento, un tipo de prueba no funcional\nc) Prueba de usabilidad, porque involucra la interacción de la interfaz de usuario\nd) Prueba de caja blanca, porque requiere conocimiento de la estructura interna del código",
+    opts: ["a","b","c","d"],
+    labels: ["a) Prueba funcional, porque proviene directamente del cliente y es de alta prioridad","b) Prueba de rendimiento, un tipo de prueba no funcional","c) Prueba de usabilidad, porque involucra la interacción de la interfaz de usuario","d) Prueba de caja blanca, porque requiere conocimiento de la estructura interna del código"],
+    correct: ["b"],
+    obj: "FL-2.2.2", k: "K2",
+    explanation: "Es un ejemplo de prueba de rendimiento, un tipo de prueba no funcional. No comprueba 'qué' hace el sistema sino 'cómo' (con qué rapidez se procesan los pedidos). No necesita conocimiento de la estructura interna."
+  },
+  {
+    id: "A10", cap: 2,
+    text: "Una empresa planea retirar un sistema heredado y migrar todos los datos a un nuevo sistema. ¿Qué tipo de prueba es necesaria?\na) Prueba de mantenimiento (migración de datos)\nb) Prueba de regresión\nc) Prueba de componente\nd) Prueba de integración",
+    opts: ["a","b","c","d"],
+    labels: ["a) Prueba de mantenimiento (migración de datos)","b) Prueba de regresión","c) Prueba de componente","d) Prueba de integración"],
+    correct: ["a"],
+    obj: "FL-2.3.1", k: "K2",
+    explanation: "Cuando se retira un sistema, puede ser necesario probar la migración de datos, que es una forma de prueba de mantenimiento. La regresión verifica que una corrección no afecte a otras partes; componente se concentra en componentes individuales; integración en interacciones entre componentes."
+  },
+  {
+    id: "A11", cap: 3,
+    text: "¿Cuál de los siguientes productos del trabajo NO puede ser objeto de prueba estática?\na) Especificaciones de requisitos\nb) Código fuente\nc) Código ejecutable de terceros (binarios sin fuente)\nd) Planes de prueba",
+    opts: ["a","b","c","d"],
+    labels: ["a) Especificaciones de requisitos","b) Código fuente","c) Código ejecutable de terceros (binarios sin fuente)","d) Planes de prueba"],
+    correct: ["c"],
+    obj: "FL-3.1.1", k: "K1",
+    explanation: "Solo el código ejecutable de terceros (sin acceso al código fuente) no puede ser revisado mediante prueba estática. Los demás productos del trabajo (requisitos, código fuente, planes) sí pueden ser objeto de prueba estática."
+  },
+  {
+    id: "A12", cap: 3,
+    text: "Un equipo realiza las siguientes actividades: I. Ejecutar pruebas y observar el comportamiento del software. II. Verificar que el código cumple los estándares de codificación. III. Usar herramientas de análisis dinámico. IV. Identificar defectos lo antes posible. V. Identificar requisitos sin casos de prueba asociados. ¿Cuáles se realizan más fácilmente con PRUEBA ESTÁTICA?\na) II y IV\nb) I y III\nc) I, III y IV\nd) II y V",
+    opts: ["a","b","c","d"],
+    labels: ["a) II y IV","b) I y III","c) I, III y IV","d) II y V"],
+    correct: ["d"],
+    obj: "FL-3.1.3", k: "K2",
+    explanation: "II (verificar cumplimiento de estándares) y V (identificar vacíos en la trazabilidad) son defectos típicos que se encuentran más fácilmente con prueba estática. I y III implican ejecutar software (prueba dinámica). IV es objetivo de ambas."
+  },
+  {
+    id: "A13", cap: 3,
+    text: "¿Cuál de las siguientes afirmaciones sobre el proceso de REVISIÓN FORMAL es CORRECTA?\na) En la revisión formal solo hay un rol\nb) Hay varias actividades durante el proceso de revisión formal\nc) La documentación a revisar debe distribuirse lo más tarde posible para que sea reciente\nd) Los defectos detectados durante la revisión no necesitan ser informados formalmente",
+    opts: ["a","b","c","d"],
+    labels: ["a) En la revisión formal solo hay un rol","b) Hay varias actividades durante el proceso de revisión formal","c) La documentación a revisar debe distribuirse lo más tarde posible","d) Los defectos detectados durante la revisión no necesitan ser informados formalmente"],
+    correct: ["b"],
+    obj: "FL-3.2.2", k: "K2",
+    explanation: "Hay varias actividades durante el proceso de revisión formal. En todos los tipos de revisión hay más de un rol, incluso en las informales. La documentación debe distribuirse lo antes posible. Se deben informar los defectos detectados."
+  },
+  {
+    id: "A14", cap: 3,
+    text: "¿Cuál de las siguientes es una tarea de la DIRECCIÓN en una revisión formal?\na) Identificar posibles anomalías durante la preparación\nb) Decidir qué se revisa, proporcionar recursos y asegurarse de que se ejecutan los planes\nc) Facilitar la reunión de revisión y mediar entre participantes\nd) Documentar las anomalías identificadas durante la reunión de revisión",
+    opts: ["a","b","c","d"],
+    labels: ["a) Identificar posibles anomalías durante la preparación","b) Decidir qué se revisa, proporcionar recursos y asegurarse de que se ejecutan los planes","c) Facilitar la reunión de revisión y mediar entre participantes","d) Documentar las anomalías identificadas durante la reunión de revisión"],
+    correct: ["b"],
+    obj: "FL-3.2.3", k: "K1",
+    explanation: "La tarea de la dirección en una revisión formal es decidir qué se revisa, proporcionar recursos y asegurarse de que se ejecutan los planes. Identificar anomalías es tarea del revisor; facilitar la reunión es del moderador; documentar es del escriba."
+  },
+  {
+    id: "A15", cap: 4,
+    text: "Para una función que clasifica: niños (<12), adolescentes (12), adultos (>12), se usa análisis de valor frontera de TRES PUNTOS. ¿Cuántos valores únicos se necesitan en total para probar todas las fronteras?\na) 3\nb) 4\nc) 5\nd) 6",
+    opts: ["a","b","c","d"],
+    labels: ["a) 3","b) 4","c) 5","d) 6"],
+    correct: ["c"],
+    obj: "FL-4.2.2", k: "K3",
+    explanation: "Tres particiones: {≤11}, {12}, {≥13}. Fronteras: 11, 12, 13. Para tres puntos por frontera: para 11→10,11,12; para 12→11,12,13; para 13→12,13,14. Valores únicos: 10, 11, 12, 13, 14 = 5 valores."
+  },
+  {
+    id: "A16", cap: 4,
+    text: "¿Cuál de las siguientes afirmaciones sobre la COBERTURA DE RAMA es CORRECTA?\na) Si no hay ramas condicionales, no se necesitan casos de prueba\nb) Cubrir solo las ramas incondicionales implica cubrir todas las ramas condicionales\nc) Una cobertura de sentencia del 100% implica una cobertura de rama del 100%\nd) Una cobertura de rama del 100% implica una cobertura de decisión del 100%",
+    opts: ["a","b","c","d"],
+    labels: ["a) Si no hay ramas condicionales, no se necesitan casos de prueba","b) Cubrir solo las ramas incondicionales implica cubrir todas las ramas condicionales","c) Una cobertura de sentencia del 100% implica una cobertura de rama del 100%","d) Una cobertura de rama del 100% implica una cobertura de decisión del 100%"],
+    correct: ["d"],
+    obj: "FL-4.3.2", k: "K2",
+    explanation: "Cada resultado de la decisión corresponde a una rama condicional, por lo que una cobertura de rama del 100% implica una cobertura de decisión del 100%. La afirmación c es al revés: cobertura de rama 100% → sentencia 100%, no al contrario."
+  },
+  {
+    id: "A17", cap: 4,
+    text: "Un probador tiene un libro con una lista de buenas prácticas de diseño de interfaz de usuario. Usa esta lista para guiar sus pruebas. ¿Qué técnica de prueba basada en experiencia está usando?\na) Predicción de errores basada en especificaciones de interfaz\nb) Prueba basada en contratos de prueba derivada del libro\nc) Prueba basada en lista de comprobación usando las buenas prácticas como condiciones de prueba\nd) Prueba exploratoria guiada por el conocimiento del dominio de usabilidad",
+    opts: ["a","b","c","d"],
+    labels: ["a) Predicción de errores basada en especificaciones de interfaz","b) Prueba basada en contratos de prueba derivada del libro","c) Prueba basada en lista de comprobación usando las buenas prácticas como condiciones de prueba","d) Prueba exploratoria guiada por el conocimiento del dominio de usabilidad"],
+    correct: ["c"],
+    obj: "FL-4.4.3", k: "K2",
+    explanation: "La lista de buenas prácticas de la interfaz de usuario es la lista de condiciones de prueba que deben comprobarse sistemáticamente → prueba basada en lista de comprobación. No es predicción de errores (no se adivinan errores del desarrollador) ni exploratoria (hay una lista estructurada)."
+  },
+  {
+    id: "A18", cap: 4,
+    text: "¿Cuál de las siguientes afirmaciones describe MEJOR la REDACCIÓN COLABORATIVA DE HISTORIAS DE USUARIO?\na) Solo el propietario del producto escribe las historias de usuario\nb) Todos los implicados crean las historias de usuario en colaboración para obtener una visión compartida\nc) Los probadores escriben las historias de usuario de forma independiente para asegurar la calidad\nd) Se trata de la lista de propiedades INVEST que debe tener cada historia de usuario",
+    opts: ["a","b","c","d"],
+    labels: ["a) Solo el propietario del producto escribe las historias de usuario","b) Todos los implicados crean las historias de usuario en colaboración para obtener una visión compartida","c) Los probadores escriben las historias de usuario de forma independiente para asegurar la calidad","d) Se trata de la lista de propiedades INVEST que debe tener cada historia de usuario"],
+    correct: ["b"],
+    obj: "FL-4.5.1", k: "K2",
+    explanation: "La redacción colaborativa de historias de usuario significa que todos los implicados crean las historias de usuario en colaboración, para obtener la visión compartida. No es una actividad exclusiva del propietario del producto."
+  },
+  {
+    id: "A19", cap: 5,
+    text: "Un plan de prueba incluye el siguiente párrafo: 'La prueba de sistema verificará todos los requisitos funcionales. Los criterios de salida son: 95% de casos de prueba ejecutados y no más de 5 defectos críticos abiertos.' ¿En qué sección del plan de prueba se incluye normalmente este contenido?\na) Alcance de la prueba\nb) Recursos y cronograma\nc) Riesgos y contingencias\nd) Enfoque de prueba",
+    opts: ["a","b","c","d"],
+    labels: ["a) Alcance de la prueba","b) Recursos y cronograma","c) Riesgos y contingencias","d) Enfoque de prueba"],
+    correct: ["d"],
+    obj: "FL-5.1.1", k: "K2",
+    explanation: "El párrafo contiene información sobre los niveles de prueba y los criterios de salida, que forman parte del enfoque de prueba del plan de prueba."
+  },
+  {
+    id: "A20", cap: 5,
+    text: "Un equipo ágil usa Planning Poker para estimar. Algunos dan 13 puntos y otros dan 8. Las estimaciones no son iguales pero la variación es pequeña. ¿Qué deberían hacer?\na) El scrum master decide el valor final sin consenso del equipo\nb) Aplicar reglas como 'aceptar el número con más votos' si la variación es pequeña\nc) Declarar que hay consenso porque 8 y 13 son cercanos en la escala de Fibonacci\nd) Eliminar la prestación del sprint porque no hay estimación acordada",
+    opts: ["a","b","c","d"],
+    labels: ["a) El scrum master decide el valor final sin consenso del equipo","b) Aplicar reglas como 'aceptar el número con más votos' si la variación es pequeña","c) Declarar que hay consenso porque 8 y 13 son cercanos","d) Eliminar la prestación del sprint porque no hay estimación acordada"],
+    correct: ["b"],
+    obj: "FL-5.1.4", k: "K3",
+    explanation: "Si las estimaciones de la prueba no son iguales, pero la variación de los resultados es pequeña, se pueden aplicar reglas como 'aceptar el número con más votos'. No debe ser el scrum master quien decida unilateralmente ni eliminarse la prestación."
+  },
+  {
+    id: "A21", cap: 5,
+    text: "¿Cuál de las siguientes afirmaciones sobre la PIRÁMIDE DE PRUEBA es INCORRECTA?\na) La pirámide hace hincapié en disponer de un mayor número de pruebas en los niveles más bajos\nb) Cerca de la cúspide de la pirámide, la automatización de la prueba debe ser más formal\nc) La prueba de componentes e integración de componentes se automatiza normalmente con herramientas basadas en API\nd) Para prueba de sistema y aceptación, las pruebas automatizadas suelen usar herramientas basadas en GUI",
+    opts: ["a","b","c","d"],
+    labels: ["a) La pirámide hace hincapié en disponer de un mayor número de pruebas en los niveles más bajos","b) Cerca de la cúspide de la pirámide, la automatización de la prueba debe ser más formal","c) La prueba de componentes e integración de componentes se automatiza normalmente con herramientas basadas en API","d) Para prueba de sistema y aceptación, las pruebas automatizadas suelen usar herramientas basadas en GUI"],
+    correct: ["b"],
+    obj: "FL-5.1.6", k: "K1",
+    explanation: "Es INCORRECTO decir que cerca de la cúspide la automatización debe ser más formal. Las afirmaciones a, c y d son correctas sobre la pirámide de prueba."
+  },
+  {
+    id: "A22", cap: 5,
+    text: "¿Cuál de las siguientes afirmaciones sobre el NIVEL DE RIESGO es CORRECTA?\na) El nivel de riesgo es igual al impacto del riesgo\nb) El nivel de riesgo es igual a la probabilidad del riesgo\nc) El impacto del riesgo y la probabilidad del riesgo son independientes entre sí\nd) Para calcular el nivel de riesgo solo se necesita el impacto",
+    opts: ["a","b","c","d"],
+    labels: ["a) El nivel de riesgo es igual al impacto del riesgo","b) El nivel de riesgo es igual a la probabilidad del riesgo","c) El impacto del riesgo y la probabilidad del riesgo son independientes entre sí","d) Para calcular el nivel de riesgo solo se necesita el impacto"],
+    correct: ["c"],
+    obj: "FL-5.2.1", k: "K1",
+    explanation: "El impacto del riesgo y la probabilidad del riesgo son factores independientes. Para calcular el nivel de riesgo se necesitan ambos factores (nivel de riesgo = probabilidad × impacto)."
+  },
+  {
+    id: "A23", cap: 5,
+    text: "Clasifica los siguientes riesgos: I. Los desarrolladores clave dejan el proyecto. II. Fallos en la seguridad del sistema. III. Rendimiento insuficiente bajo carga. IV. Los requisitos cambian con frecuencia. V. Datos personales de usuarios expuestos. ¿Cuál opción los clasifica CORRECTAMENTE entre riesgo de proyecto y riesgo de producto?\na) Proyecto: I, IV — Producto: II, III, V\nb) Proyecto: I, II, IV — Producto: III, V\nc) Proyecto: II, III — Producto: I, IV, V\nd) Proyecto: I, III, V — Producto: II, IV",
+    opts: ["a","b","c","d"],
+    labels: ["a) Proyecto: I, IV — Producto: II, III, V","b) Proyecto: I, II, IV — Producto: III, V","c) Proyecto: II, III — Producto: I, IV, V","d) Proyecto: I, III, V — Producto: II, IV"],
+    correct: ["a"],
+    obj: "FL-5.2.2", k: "K2",
+    explanation: "Riesgo de proyecto: I (desarrolladores clave se van), IV (requisitos cambian). Riesgo de producto: II (fallos en seguridad), III (rendimiento insuficiente), V (datos expuestos)."
+  },
+  {
+    id: "A24", cap: 5,
+    text: "Un jefe de prueba identifica que el módulo de pagos tiene alto riesgo y decide dedicar más casos de prueba y mayor profundidad de prueba a ese módulo. ¿Qué tipo de actividad de gestión de riesgos describe esto?\na) Monitorización del riesgo\nb) Decisión arquitectónica sobre el diseño del módulo\nc) Análisis del riesgo cuantitativo\nd) Cómo el análisis del riesgo influye en la minuciosidad de la prueba",
+    opts: ["a","b","c","d"],
+    labels: ["a) Monitorización del riesgo","b) Decisión arquitectónica sobre el diseño del módulo","c) Análisis del riesgo cuantitativo","d) Cómo el análisis del riesgo influye en la minuciosidad de la prueba"],
+    correct: ["d"],
+    obj: "FL-5.2.3", k: "K2",
+    explanation: "Esto muestra cómo el análisis del riesgo influye en la minuciosidad de la prueba (es decir, en el nivel de detalle). No es monitorización (eso sería verificar si el riesgo cambió), ni una decisión arquitectónica, ni un análisis cuantitativo específico."
+  },
+  {
+    id: "A25", cap: 5,
+    text: "¿Cuáles de las siguientes métricas están relacionadas con la CALIDAD DEL OBJETO DE PRUEBA? (Selecciona DOS)\na) Número de defectos encontrados\nb) Coste por caso de prueba ejecutado\nc) Número de casos de prueba ejecutados\nd) Densidad de defectos\ne) Tiempo promedio de reparación de defectos",
+    opts: ["a","b","c","d","e"],
+    labels: ["a) Número de defectos encontrados","b) Coste por caso de prueba ejecutado","c) Número de casos de prueba ejecutados","d) Densidad de defectos","e) Tiempo promedio de reparación de defectos"],
+    correct: ["a","d"],
+    obj: "FL-5.3.1", k: "K1",
+    explanation: "El número de defectos encontrados (a) y la densidad de defectos (d) están relacionados con la calidad del objeto de prueba. El coste por CP es eficiencia de la prueba; el número de CP ejecutados no nos dice nada sobre calidad; el tiempo de reparación es métrica del proceso."
+  },
+  {
+    id: "A26", cap: 5,
+    text: "¿Cuál de las siguientes métricas de prueba NO es relevante para los REPRESENTANTES DE NEGOCIO?\na) Impedimentos para realizar las pruebas\nb) Cobertura de prueba de rama (branch coverage)\nc) Avance de la prueba en el proyecto\nd) Riesgos identificados durante las pruebas",
+    opts: ["a","b","c","d"],
+    labels: ["a) Impedimentos para realizar las pruebas","b) Cobertura de prueba de rama (branch coverage)","c) Avance de la prueba en el proyecto","d) Riesgos identificados durante las pruebas"],
+    correct: ["b"],
+    obj: "FL-5.3.2", k: "K2",
+    explanation: "La prueba de rama es una métrica técnica utilizada por desarrolladores y probadores técnicos. Esta información no interesa a los representantes de negocio. Los impedimentos, el avance y los riesgos sí son relevantes para el negocio."
+  }
+]
+
+const NOTA_APROBACION = 65;
+
+let state = {
+  mode:'exam', set:'main', questions:[], current:0,
+  answers:{}, flags:new Set(), timer:null, timeLeft:0, finished:false
+};
+function getQuestionSet(s){
+  if(s==='main') return QUESTIONS.slice(0,40);
+  if(s==='extra') return QUESTIONS.slice(40);
+  return QUESTIONS;
+}
+function selectMode(el,mode){document.querySelectorAll('.mode-card').forEach(c=>c.classList.remove('selected'));el.classList.add('selected');state.mode=mode;}
+function selectSet(el,set){document.querySelectorAll('.set-btn').forEach(b=>b.classList.remove('selected'));el.classList.add('selected');state.set=set;}
+function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');}
+function goToStart(){clearInterval(state.timer);state.finished=false;showScreen('startScreen');}
+function startExam(){
+  state.questions=[...getQuestionSet(state.set)];
+  state.current=0;state.answers={};state.flags=new Set();state.finished=false;
+  state.timeLeft=state.mode==='exam'?65*60:0;
+  document.getElementById('headerSub').textContent=state.questions.length+' preguntas · '+(state.mode==='exam'?'Modo Examen':'Modo Práctica');
+  showScreen('examScreen');buildDotNav();renderQuestion();
+  if(state.mode==='exam')startTimer();else document.getElementById('timerDisplay').textContent='';
+}
+function startTimer(){
+  clearInterval(state.timer);
+  state.timer=setInterval(()=>{state.timeLeft--;updateTimer();if(state.timeLeft<=0){clearInterval(state.timer);finishExam();}},1000);
+  updateTimer();
+}
+function updateTimer(){
+  const m=Math.floor(state.timeLeft/60).toString().padStart(2,'0'),s=(state.timeLeft%60).toString().padStart(2,'0');
+  const el=document.getElementById('timerDisplay');el.textContent=m+':'+s;
+  el.className='timer';if(state.timeLeft<300)el.classList.add('warning');if(state.timeLeft<60){el.classList.remove('warning');el.classList.add('danger');}
+}
+function buildDotNav(){
+  const nav=document.getElementById('dotNav');nav.innerHTML='';
+  state.questions.forEach((q,i)=>{const d=document.createElement('div');d.className='dot';d.textContent=typeof q.id==='number'?q.id:q.id;d.onclick=()=>{state.current=i;renderQuestion();};nav.appendChild(d);});
+}
+function updateDots(){
+  const dots=document.querySelectorAll('.dot');
+  dots.forEach((d,i)=>{d.className='dot';const q=state.questions[i];if(state.answers[q.id]&&state.answers[q.id].length>0)d.classList.add('answered');if(state.flags.has(q.id))d.classList.add('flagged');if(i===state.current)d.classList.add('current');});
+}
+function renderQuestion(){
+  const q=state.questions[state.current],total=state.questions.length;
+  document.getElementById('qCounter').textContent='Pregunta '+(state.current+1)+' de '+total;
+  document.getElementById('progressFill').style.width=(((state.current+1)/total)*100)+'%';
+  const isMulti=q.correct.length>1,selected=state.answers[q.id]||[],isAnswered=selected.length>0;
+  const showFeedback=state.mode==='practice'&&isAnswered;
+  let html='<div class="q-badge">Cap. '+q.cap+' · '+q.obj+' · '+q.k+'</div>';
+  if(isMulti)html+='<div class="multi-hint">⚡ Seleccioná '+q.correct.length+' respuestas</div>';
+  html+='<div class="q-text">'+q.text+'</div><div class="options">';
+  q.labels.forEach((label,idx)=>{
+    const letter=q.opts[idx];let cls='option';
+    if(showFeedback){cls+=' disabled';if(q.correct.includes(letter))cls+=' correct';else if(selected.includes(letter))cls+=' wrong';}
+    else if(!isAnswered||state.finished){if(selected.includes(letter))cls+=' selected-option';if(state.finished)cls+=' disabled';}
+    else{cls+=' disabled';if(selected.includes(letter))cls+=' selected-option';}
+    html+='<div class="'+cls+'" onclick="selectOption('+q.id+',\''+letter+'\','+isMulti+')"><span class="opt-letter">'+letter.toUpperCase()+'</span><span>'+label+'</span></div>';
+  });
+  html+='</div>';
+  if(showFeedback){
+    const isCorrect=JSON.stringify([...selected].sort())===JSON.stringify([...q.correct].sort());
+    html+='<div class="explanation visible"><strong>'+(isCorrect?'✓ Correcto':'✗ Incorrecto — Respuesta correcta: '+q.correct.join(', ').toUpperCase())+'</strong>'+q.explanation+'<div class="obj">🎯 Objetivo: '+q.obj+'</div></div>';
+  }
+  document.getElementById('questionCard').innerHTML=html;
+  document.getElementById('prevBtn').disabled=state.current===0;
+  const isLast=state.current===total-1;
+  document.getElementById('nextBtn').style.display=isLast?'none':'inline-block';
+  document.getElementById('finishBtn').style.display=isLast?'inline-block':'none';
+  const fb=document.getElementById('flagBtn');
+  fb.className=state.flags.has(q.id)?'flag-btn flagged':'flag-btn';
+  fb.textContent=state.flags.has(q.id)?'🚩 Marcada':'🚩 Marcar';
+  updateDots();
+}
+function selectOption(qId,letter,isMulti){
+  if(state.finished)return;
+  if(state.mode==='practice'&&state.answers[qId]&&state.answers[qId].length>0)return;
+  let sel=state.answers[qId]?[...state.answers[qId]]:[];
+  if(isMulti){if(sel.includes(letter))sel=sel.filter(l=>l!==letter);else sel.push(letter);if(sel.length>state.questions.find(q=>q.id==qId).correct.length)sel.shift();}
+  else sel=[letter];
+  state.answers[qId]=sel;renderQuestion();
+}
+function navigate(dir){state.current=Math.max(0,Math.min(state.questions.length-1,state.current+dir));renderQuestion();}
+function toggleFlag(){const q=state.questions[state.current];if(state.flags.has(q.id))state.flags.delete(q.id);else state.flags.add(q.id);renderQuestion();}
+function finishExam(){clearInterval(state.timer);state.finished=true;showResults();}
+function showResults(){
+  showScreen('resultsScreen');
+  const qs=state.questions;let correct=0,wrong=0,skipped=0;const byChapter={};
+  qs.forEach(q=>{
+    if(!byChapter[q.cap])byChapter[q.cap]={total:0,correct:0};byChapter[q.cap].total++;
+    const sel=state.answers[q.id]||[];if(sel.length===0){skipped++;return;}
+    const isOk=JSON.stringify([...sel].sort())===JSON.stringify([...q.correct].sort());
+    if(isOk){correct++;byChapter[q.cap].correct++;}else wrong++;
+  });
+  const total=qs.length,pct=Math.round((correct/total)*100),pass=pct>=NOTA_APROBACION;
+  document.getElementById('resultHero').innerHTML=
+    '<div class="score-circle '+(pass?'pass':'fail')+'">'
+    +'<div class="pct">'+pct+'%</div><div class="label">'+correct+'/'+total+'</div></div>'
+    +'<div class="verdict '+(pass?'pass':'fail')+'">'+(pass?'🎉 ¡APROBADO!':'😔 No aprobado')+'</div>'
+    +'<div class="result-note">Se necesita el '+NOTA_APROBACION+'% para aprobar · ('+Math.ceil(total*NOTA_APROBACION/100)+'/'+total+' correctas)</div>'
+    +'<div class="result-stats">'
+    +'<div class="rs correct"><div class="n">'+correct+'</div><div class="l">Correctas</div></div>'
+    +'<div class="rs wrong"><div class="n">'+wrong+'</div><div class="l">Incorrectas</div></div>'
+    +'<div class="rs skipped"><div class="n">'+skipped+'</div><div class="l">Sin resp.</div></div>'
+    +'</div>'
+    +'<div class="result-actions">'
+    +'<button class="primary-btn" onclick="startExam()">🔁 Volver a intentar</button>'
+    +'<button onclick="goToStart()">🏠 Inicio</button>'
+    +'</div>';
+  let bHtml='<h3>📊 Resultado por capítulo</h3>';
+  Object.keys(byChapter).sort().forEach(cap=>{
+    const d=byChapter[cap],cpct=d.total>0?Math.round((d.correct/d.total)*100):0;
+    bHtml+='<div class="ch-row"><div class="ch-label">Cap. '+cap+'</div><div class="ch-bar-wrap"><div class="ch-bar" style="width:'+cpct+'%;background:'+(cpct>=NOTA_APROBACION?'var(--green)':'var(--red)')+'"></div></div><div class="ch-score">'+d.correct+'/'+d.total+'</div></div>';
+  });
+  document.getElementById('chBreakdown').innerHTML=bHtml;
+  let rHtml='<h3>📋 Revisión de respuestas</h3>';
+  const sorted=[...qs].sort((a,b)=>{
+    const aOk=(state.answers[a.id]||[]).length>0&&JSON.stringify([...(state.answers[a.id]||[])].sort())===JSON.stringify([...a.correct].sort());
+    const bOk=(state.answers[b.id]||[]).length>0&&JSON.stringify([...(state.answers[b.id]||[])].sort())===JSON.stringify([...b.correct].sort());
+    return(aOk?1:0)-(bOk?1:0);
+  });
+  sorted.forEach(q=>{
+    const sel=state.answers[q.id]||[];
+    const isOk=sel.length>0&&JSON.stringify([...sel].sort())===JSON.stringify([...q.correct].sort());
+    const isSkip=sel.length===0;
+    rHtml+='<div class="review-item"><div class="ri-status '+(isSkip?'sk':isOk?'ok':'no')+'">'+(isSkip?'—':isOk?'✓':'✗')+'</div>'
+      +'<div class="ri-body"><div class="ri-qtext">'+q.id+'. '+q.text.split('\n')[0]+'</div>'
+      +'<div class="ri-answer">'
+      +(isSkip?'<span class="got">Sin respuesta</span>':'')
+      +(!isSkip&&!isOk?'<span class="got">Tuya: '+sel.join(',').toUpperCase()+'</span> · ':'')
+      +'<span class="expected">Correcta: '+q.correct.join(',').toUpperCase()+'</span>'
+      +(isOk?'':' · <small style="color:var(--gray-mid)">'+q.explanation.substring(0,80)+'…</small>')
+      +'</div></div></div>';
+  });
+  document.getElementById('reviewList').innerHTML=rHtml;
+}
+</script>
+</body>
+</html>
